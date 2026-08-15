@@ -15,17 +15,12 @@ public class Echo {
                       + "|_____\\___|_| |_|\\___/ \n";
         String salutation = "Hello! I'm " + NAME + ".\n" +
                           "How can I help?";
-        System.out.println(SEPARATOR);
-        System.out.println(banner);
-        System.out.println(salutation);
-        System.out.println(SEPARATOR);
+        Echo.echo(banner + "\n" + salutation);
     }
 
     private static void farewell() {
         String valediction = "Bye!";
-        System.out.println(SEPARATOR);
-        System.out.println(valediction);
-        System.out.println(SEPARATOR);
+        Echo.echo(valediction);
     }
 
     private static void echo(String input) {
