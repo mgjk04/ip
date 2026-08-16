@@ -40,7 +40,8 @@ public class Echo {
             return;
         }
         tasks[itemCnt++] = t;
-        Echo.echo("Got it. I've add this task:\n" + t.toString() + "\nNow you have " + itemCnt + " tasks in the list.");
+        Echo.echo("Got it. I've added this task:\n" + t.toString()
+                + "\nNow you have " + itemCnt + " tasks in the list.");
     }
 
     private static void list() {
@@ -48,7 +49,7 @@ public class Echo {
         StringBuilder listTxt = new StringBuilder("Here are the tasks in your list:\n");
         for (int i = 1; i <= itemCnt; ++i) {
             Task task = tasks[i - 1];
-            listTxt.append(i).append(". ").append(task.toString());
+            listTxt.append(i).append(".").append(task.toString());
             if (i != itemCnt) listTxt.append("\n");
         }
         Echo.echo(listTxt.toString());
