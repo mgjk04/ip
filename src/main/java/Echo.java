@@ -125,6 +125,13 @@ public class Echo {
                 Echo.add(t);
                 continue;
             }
+            if (input.startsWith("deadline ")) {
+                String[] parts = input.substring(9).split(" /by ");
+                String description = parts[0].trim();
+                String by = parts[1].trim();
+                Echo.add(new Deadline(description, by));
+                continue;
+            }
             Echo.add(new Task(input));
         }
         Echo.farewell();
