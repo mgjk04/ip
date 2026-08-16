@@ -3,8 +3,8 @@ import java.util.Scanner;
 public class Echo {
     private static final String NAME = "Echo";
     private static final String SEPARATOR = "============================================================";
-    private static final String[] itemArray = new String[100];
-    private static int lastIdx = 0;
+    private static final String[] items = new String[100];
+    private static int itemCnt = 0;
 
 
     private static void greet() {
@@ -30,21 +30,21 @@ public class Echo {
     }
 
     private static void add(String item) {
-        if (lastIdx == itemArray.length) {
+        if (itemCnt == items.length) {
             Echo.echo("I can't remember any more! Sorry!");
             return;
         }
-        itemArray[lastIdx++] = item;
+        items[itemCnt++] = item;
         Echo.echo("added: " + item);
     }
 
     private static void list() {
-        System.out.println(SEPARATOR);
-        for (int i = 1; i <= lastIdx; ++i) {
-            String entry = i + ". " + itemArray[i - 1];
-            System.out.println(entry);
+        StringBuilder listTxt = new StringBuilder();
+        for (int i = 1; i <= itemCnt; ++i) {
+            listTxt.append(i).append(". ").append(items[i - 1]);
+            if (i != itemCnt) listTxt.append("\n");
         }
-        System.out.println(SEPARATOR);
+        Echo.echo(listTxt.toString());
     }
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
