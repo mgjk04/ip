@@ -76,3 +76,52 @@ Here are the tasks in your list:
 Bye!
 ============================================================
 ```
+
+## Test case: invalid commands show helpful errors
+
+- **Aim:** Verify that Echo catches invalid commands and malformed task inputs without terminating the session.
+- **Command:** `java -cp build/classes Echo`
+- **Inputs:**
+```text
+todo
+blah
+deadline submit report
+event project meeting /from Monday
+mark one
+unmark 1
+bye
+```
+- **Expected output:**
+```text
+============================================================
+ _____     _           
+| ____|___| |__   ___  
+|  _| / __| '_ \ / _ \ 
+| |__| (__| | | | (_) |
+|_____\___|_| |_|\___/ 
+
+Hello! I'm Echo.
+How can I help?
+============================================================
+============================================================
+OOPS!!! The description of a todo cannot be empty.
+============================================================
+============================================================
+OOPS!!! I'm sorry, but I don't know what that means :-(
+============================================================
+============================================================
+OOPS!!! A deadline needs a description and a due date after /by.
+============================================================
+============================================================
+OOPS!!! An event needs a description, a start time after /from, and an end time after /to.
+============================================================
+============================================================
+OOPS!!! Please provide a valid task number to mark.
+============================================================
+============================================================
+OOPS!!! That task number is not in the list.
+============================================================
+============================================================
+Bye!
+============================================================
+```
