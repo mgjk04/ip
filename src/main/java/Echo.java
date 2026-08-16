@@ -31,7 +31,7 @@ public class Echo {
 
     private static void add(Task t) throws EchoException {
         if (itemCnt == tasks.length) {
-            throw new EchoException("I can't remember any more tasks."); // Modified by Codex
+            throw new MemoryLimitExceededException(); // Modified by Codex
         }
         tasks[itemCnt++] = t;
         Echo.echo("Got it. I've added this task:\n" + t.toString()
@@ -59,19 +59,19 @@ public class Echo {
         try {
             int taskNumber = Integer.parseInt(taskNumberText);
             if (taskNumber < 1 || taskNumber > itemCnt) {
-                throw new EchoException("That task number is not in the list.");
+                throw new InvalidTaskNumberException(itemCnt);
             }
             // Hunk modified by Codex:
             Task task = tasks[taskNumber - 1];
             task.markDone();
             Echo.echo("Nice! I've marked this task as done:\n" + task.toString());
         } catch (NumberFormatException e) {
-            throw new EchoException("Please provide a valid task number to mark.");
+            throw new InvalidTaskNumberException(itemCnt);
         }
     }
 
     /**
-     * Method with some Codex contribution:
+     * Method with Codex contribution:
      * Marks the task at the given one-based task number as not done.
      *
      * @param taskNumberText text supplied after the {@code unmark} command
@@ -80,36 +80,19 @@ public class Echo {
         try {
             int taskNumber = Integer.parseInt(taskNumberText);
             if (taskNumber < 1 || taskNumber > itemCnt) {
-                throw new EchoException("That task number is not in the list."); // Modified by Codex
+                throw new InvalidTaskNumberException(itemCnt);
             }
-            // Hunk modified by Codex:
+            // Code with Codex contribution:
             Task task = tasks[taskNumber - 1];
             task.markUnDone();
             Echo.echo("OK, I've marked this task as not done yet:\n" + task.toString());
         } catch (NumberFormatException e) {
-            throw new EchoException("Please provide a valid task number to unmark."); // Modified by Codex
+            throw new InvalidTaskNumberException(itemCnt); // Modified by Codex
         }
     }
 
     private static void showError(EchoException e) {
         Echo.echo(e.getMessage());
-    }
-
-    /**
-     * Method created by Codex:
-     * Validates the text following a command keyword as a task description.
-     *
-     * @param description task description supplied by the user
-     * @param taskType name of the task type used in the error message
-     * @return the trimmed description
-     * @throws EchoException if the description is empty
-     */
-    private static String requireDescription(String description, String taskType) throws EchoException {
-        String trimmedDescription = description.trim();
-        if (trimmedDescription.isEmpty()) {
-            throw new EchoException("The description of a " + taskType + " cannot be empty.");
-        }
-        return trimmedDescription;
     }
 
     /** Method created by Codex: Returns whether the input starts with a complete command keyword. */
@@ -118,7 +101,7 @@ public class Echo {
     }
 
     /**
-     * Method created by Codex:
+     * Method with Codex contribution:
      * Processes one input line, returning whether the user requested the chatbot to exit.
      *
      * @param input command line entered by the user
@@ -145,27 +128,35 @@ public class Echo {
             return false;
         }
         if (isCommand(trimmedInput, "todo")) {
-            String description = requireDescription(trimmedInput.substring("todo".length()), "todo");
+            String description = trimmedInput.substring("todo".length()).trim();
+            if (description.isEmpty()) { throw new TodoFormatException(); }
             Echo.add(new Todo(description));
             return false;
         }
         if (isCommand(trimmedInput, "deadline")) {
             String[] parts = trimmedInput.substring("deadline".length()).trim().split(" /by ", 2);
-            if (parts.length != 2 || parts[1].trim().isEmpty()) {
-                throw new EchoException("A deadline needs a description and a due date after /by.");
+            if  (parts.length != 2) { throw new DeadlineFormatException(); }
+            String description = parts[0].trim();
+            String dueDate = parts[1].trim();
+            if (description.isEmpty() || dueDate.isEmpty()) {
+                throw new DeadlineFormatException();
             }
-            Echo.add(new Deadline(requireDescription(parts[0], "deadline"), parts[1].trim()));
+            Echo.add(new Deadline(description, dueDate));
             return false;
         }
         if (isCommand(trimmedInput, "event")) {
             String[] parts = trimmedInput.substring("event".length()).trim().split(" /from | /to ", 3);
-            if (parts.length != 3 || parts[1].trim().isEmpty() || parts[2].trim().isEmpty()) {
-                throw new EchoException("An event needs a description, a start time after /from, and an end time after /to.");
+            if  (parts.length != 3) { throw new EventFormatException(); }
+            String description = parts[0].trim();
+            String startTime = parts[1].trim();
+            String endTime = parts[2].trim();
+            if (description.isEmpty() || startTime.isEmpty() || endTime.isEmpty()) {
+                throw new EventFormatException();
             }
-            Echo.add(new Event(requireDescription(parts[0], "event"), parts[1].trim(), parts[2].trim()));
+            Echo.add(new Event(description, startTime, endTime));
             return false;
         }
-        throw new EchoException("I'm sorry, but I don't know what that means :-(");
+        throw new UnknownCommandException();
     }
 
     public static void main(String[] args) {
