@@ -48,8 +48,7 @@ public class Echo {
         StringBuilder listTxt = new StringBuilder("Here are the tasks in your list:\n");
         for (int i = 1; i <= itemCnt; ++i) {
             Task task = tasks[i - 1];
-            listTxt.append(i).append(".[").append(task.getStatusIcon())
-                    .append("] ").append(task.getDescription());
+            listTxt.append(i).append(". ").append(task.toString());
             if (i != itemCnt) listTxt.append("\n");
         }
         Echo.echo(listTxt.toString());
@@ -70,16 +69,15 @@ public class Echo {
             }
             // Hunk modified by Codex:
             Task task = tasks[taskNumber - 1];
-            task.markAsDone();
-            Echo.echo("Nice! I've marked this task as done:\n  ["
-                    + task.getStatusIcon() + "] " + task.getDescription());
+            task.markDone();
+            Echo.echo("Nice! I've marked this task as done:\n" + task.toString());
         } catch (NumberFormatException e) {
             Echo.echo("Please provide a task number to mark.");
         }
     }
 
     /**
-     * Method created by Codex:
+     * Method with some Codex contribution:
      * Marks the task at the given one-based task number as not done.
      *
      * @param taskNumberText text supplied after the {@code unmark} command
@@ -93,9 +91,8 @@ public class Echo {
             }
             // Hunk modified by Codex:
             Task task = tasks[taskNumber - 1];
-            task.markAsNotDone();
-            Echo.echo("OK, I've marked this task as not done yet:\n  ["
-                    + task.getStatusIcon() + "] " + task.getDescription());
+            task.markUnDone();
+            Echo.echo("OK, I've marked this task as not done yet:\n" + task.toString());
         } catch (NumberFormatException e) {
             Echo.echo("Please provide a task number to unmark.");
         }
