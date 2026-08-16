@@ -28,5 +28,6 @@ Prerequisites: JDK 25, update Intellij to the most recent version.
 Codex:
 * Suggestions on code improvements.
 * Performing repetitive / manual tasks (e.g. ASCII banner generation).
-* Present-changes-visually skill: https://github.com/se-edu/skill-present-changes-visually.
+* present-changes-visually skill: https://github.com/se-edu/skill-present-changes-visually.
+* test-ui skill from ip Level-4 AI guidance section
 * Code generation as directed by ip instructions under "AI Guidance" sections. Such code will be annotated with comments.
