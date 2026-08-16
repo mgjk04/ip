@@ -104,22 +104,22 @@ Hello! I'm Echo.
 How can I help?
 ============================================================
 ============================================================
-OOPS!!! The description of a todo cannot be empty.
+OOPS!!! Invalid todo command. Format: todo <description>
 ============================================================
 ============================================================
-OOPS!!! I'm sorry, but I don't know what that means :-(
+OOPS!!! Unknown command. I'm sorry, but I don't know what that means :(
 ============================================================
 ============================================================
-OOPS!!! A deadline needs a description and a due date after /by.
+OOPS!!! Invalid deadline command. Format: deadline <description> /by <dueDate>
 ============================================================
 ============================================================
-OOPS!!! An event needs a description, a start time after /from, and an end time after /to.
+OOPS!!! Invalid event command. Format: event <description> /from <startTime> /to <endTime>
 ============================================================
 ============================================================
-OOPS!!! Please provide a valid task number to mark.
+OOPS!!! Please provide a valid task number. Check the list and choose a valid task number.
 ============================================================
 ============================================================
-OOPS!!! That task number is not in the list.
+OOPS!!! Please provide a valid task number. Check the list and choose a valid task number.
 ============================================================
 ============================================================
 Bye!
