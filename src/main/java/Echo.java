@@ -1,9 +1,5 @@
 import java.util.Scanner;
 
-/**
- * Comment by Codex:
- * Runs a simple command-line task list that can add, list, mark, and unmark tasks.
- */
 public class Echo {
     private static final String NAME = "Echo";
     private static final String SEPARATOR = "============================================================";
@@ -33,11 +29,9 @@ public class Echo {
         System.out.println(SEPARATOR);
     }
 
-    private static void add(Task t) {
-        // Method modified by Codex:
+    private static void add(Task t) throws EchoException {
         if (itemCnt == tasks.length) {
-            Echo.echo("I can't remember any more! Sorry!");
-            return;
+            throw new EchoException("I can't remember any more tasks."); // Modified by Codex
         }
         tasks[itemCnt++] = t;
         Echo.echo("Got it. I've added this task:\n" + t.toString()
@@ -61,19 +55,18 @@ public class Echo {
      *
      * @param taskNumberText text supplied after the {@code mark} command
      */
-    private static void mark(String taskNumberText) {
+    private static void mark(String taskNumberText) throws EchoException {
         try {
             int taskNumber = Integer.parseInt(taskNumberText);
             if (taskNumber < 1 || taskNumber > itemCnt) {
-                Echo.echo("That task number is not in the list.");
-                return;
+                throw new EchoException("That task number is not in the list.");
             }
             // Hunk modified by Codex:
             Task task = tasks[taskNumber - 1];
             task.markDone();
             Echo.echo("Nice! I've marked this task as done:\n" + task.toString());
         } catch (NumberFormatException e) {
-            Echo.echo("Please provide a task number to mark.");
+            throw new EchoException("Please provide a valid task number to mark.");
         }
     }
 
@@ -83,20 +76,96 @@ public class Echo {
      *
      * @param taskNumberText text supplied after the {@code unmark} command
      */
-    private static void unmark(String taskNumberText) {
+    private static void unmark(String taskNumberText) throws EchoException {
         try {
             int taskNumber = Integer.parseInt(taskNumberText);
             if (taskNumber < 1 || taskNumber > itemCnt) {
-                Echo.echo("That task number is not in the list.");
-                return;
+                throw new EchoException("That task number is not in the list."); // Modified by Codex
             }
             // Hunk modified by Codex:
             Task task = tasks[taskNumber - 1];
             task.markUnDone();
             Echo.echo("OK, I've marked this task as not done yet:\n" + task.toString());
         } catch (NumberFormatException e) {
-            Echo.echo("Please provide a task number to unmark.");
+            throw new EchoException("Please provide a valid task number to unmark."); // Modified by Codex
         }
+    }
+
+    private static void showError(EchoException e) {
+        Echo.echo(e.getMessage());
+    }
+
+    /**
+     * Method created by Codex:
+     * Validates the text following a command keyword as a task description.
+     *
+     * @param description task description supplied by the user
+     * @param taskType name of the task type used in the error message
+     * @return the trimmed description
+     * @throws EchoException if the description is empty
+     */
+    private static String requireDescription(String description, String taskType) throws EchoException {
+        String trimmedDescription = description.trim();
+        if (trimmedDescription.isEmpty()) {
+            throw new EchoException("The description of a " + taskType + " cannot be empty.");
+        }
+        return trimmedDescription;
+    }
+
+    /** Method created by Codex: Returns whether the input starts with a complete command keyword. */
+    private static boolean isCommand(String input, String command) {
+        return input.equals(command) || input.startsWith(command + " ");
+    }
+
+    /**
+     * Method created by Codex:
+     * Processes one input line, returning whether the user requested the chatbot to exit.
+     *
+     * @param input command line entered by the user
+     * @return true when Echo should stop accepting commands
+     * @throws EchoException if the command or its arguments are invalid
+     */
+    private static boolean processCommand(String input) throws EchoException {
+        String trimmedInput = input.trim();
+        if (trimmedInput.equals("bye")) {
+            return true;
+        }
+        if (trimmedInput.equals("list")) {
+            Echo.list();
+            return false;
+        }
+        if (isCommand(trimmedInput, "unmark")) {
+            String taskNumber = trimmedInput.substring("unmark".length()).trim();
+            Echo.unmark(taskNumber);
+            return false;
+        }
+        if (isCommand(trimmedInput, "mark")) {
+            String taskNumber = trimmedInput.substring("mark".length()).trim();
+            Echo.mark(taskNumber);
+            return false;
+        }
+        if (isCommand(trimmedInput, "todo")) {
+            String description = requireDescription(trimmedInput.substring("todo".length()), "todo");
+            Echo.add(new Todo(description));
+            return false;
+        }
+        if (isCommand(trimmedInput, "deadline")) {
+            String[] parts = trimmedInput.substring("deadline".length()).trim().split(" /by ", 2);
+            if (parts.length != 2 || parts[1].trim().isEmpty()) {
+                throw new EchoException("A deadline needs a description and a due date after /by.");
+            }
+            Echo.add(new Deadline(requireDescription(parts[0], "deadline"), parts[1].trim()));
+            return false;
+        }
+        if (isCommand(trimmedInput, "event")) {
+            String[] parts = trimmedInput.substring("event".length()).trim().split(" /from | /to ", 3);
+            if (parts.length != 3 || parts[1].trim().isEmpty() || parts[2].trim().isEmpty()) {
+                throw new EchoException("An event needs a description, a start time after /from, and an end time after /to.");
+            }
+            Echo.add(new Event(requireDescription(parts[0], "event"), parts[1].trim(), parts[2].trim()));
+            return false;
+        }
+        throw new EchoException("I'm sorry, but I don't know what that means :-(");
     }
 
     public static void main(String[] args) {
@@ -104,41 +173,12 @@ public class Echo {
         Echo.greet();
         while (scanner.hasNextLine()) {
             String input = scanner.nextLine();
-            if (input.equals("bye")) {
-                break;
-            }
-            if (input.equals("list")) {
-                Echo.list();
-                continue;
-            }
-            // Code with Codex contribution:
-            if (input.startsWith("unmark ")) {
-                Echo.unmark(input.substring(6).trim());
-                continue;
-            }
-            // Code with Codex contribution:
-            if (input.startsWith("mark ")) {
-                Echo.mark(input.substring(4).trim());
-                continue;
-            }
-            if (input.startsWith("todo ")) {
-                Task t = new Todo(input.substring(5).trim());
-                Echo.add(t);
-                continue;
-            }
-            if (input.startsWith("deadline ")) {
-                String[] parts = input.substring(9).split(" /by ");
-                String description = parts[0].trim();
-                String by = parts[1].trim();
-                Echo.add(new Deadline(description, by));
-                continue;
-            }
-            if (input.startsWith("event ")) {
-                String[] parts = input.substring(6).split(" /from | /to ");
-                String description = parts[0].trim();
-                String from = parts[1].trim();
-                String to = parts[2].trim();
-                Echo.add(new Event(description, from, to));
+            try {
+                if (processCommand(input)) { // Modified by Codex
+                    break;
+                }
+            } catch (EchoException exception) { // Modified by Codex
+                showError(exception);
             }
         }
         Echo.farewell();
