@@ -33,14 +33,14 @@ public class Echo {
         System.out.println(SEPARATOR);
     }
 
-    private static void add(String description) {
+    private static void add(Task t) {
         // Method modified by Codex:
         if (itemCnt == tasks.length) {
             Echo.echo("I can't remember any more! Sorry!");
             return;
         }
-        tasks[itemCnt++] = new Task(description);
-        Echo.echo("added: " + description);
+        tasks[itemCnt++] = t;
+        Echo.echo("added: " + t.getDescription());
     }
 
     private static void list() {
@@ -120,7 +120,7 @@ public class Echo {
                 Echo.mark(input.substring(4).trim());
                 continue;
             }
-            Echo.add(input);
+            Echo.add(new Task(input));
         }
         Echo.farewell();
         scanner.close();
