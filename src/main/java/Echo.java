@@ -1,9 +1,14 @@
 import java.util.Scanner;
 
+/**
+ * Runs a simple command-line task list that can add, list, and mark tasks as done.
+ */
 public class Echo {
     private static final String NAME = "Echo";
     private static final String SEPARATOR = "============================================================";
     private static final String[] items = new String[100];
+    /** Stores whether the task at each corresponding {@code items} index is complete. */
+    private static final boolean[] done = new boolean[100]; //By Codex
     private static int itemCnt = 0;
 
 
@@ -39,13 +44,36 @@ public class Echo {
     }
 
     private static void list() {
-        StringBuilder listTxt = new StringBuilder();
+        // Modification by Codex:
+        StringBuilder listTxt = new StringBuilder("Here are the tasks in your list:\n");
         for (int i = 1; i <= itemCnt; ++i) {
-            listTxt.append(i).append(". ").append(items[i - 1]);
+            listTxt.append(i).append(".[").append(done[i - 1] ? "X" : " ")
+                    .append("] ").append(items[i - 1]);
             if (i != itemCnt) listTxt.append("\n");
         }
         Echo.echo(listTxt.toString());
     }
+
+    /**
+     * Method created by Codex:
+     * Marks the task at the given one-based task number as complete.
+     *
+     * @param taskNumberText text supplied after the {@code mark} command
+     */
+    private static void mark(String taskNumberText) {
+        try {
+            int taskNumber = Integer.parseInt(taskNumberText);
+            if (taskNumber < 1 || taskNumber > itemCnt) {
+                Echo.echo("That task number is not in the list.");
+                return;
+            }
+            done[taskNumber - 1] = true;
+            Echo.echo("Nice! I've marked this task as done:\n  [X] " + items[taskNumber - 1]);
+        } catch (NumberFormatException e) {
+            Echo.echo("Please provide a task number to mark.");
+        }
+    }
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Echo.greet();
@@ -56,6 +84,11 @@ public class Echo {
             }
             if (input.equals("list")) {
                 Echo.list();
+                continue;
+            }
+            // Created by Codex:
+            if (input.equals("mark") || input.startsWith("mark ")) {
+                Echo.mark(input.substring(4).trim());
                 continue;
             }
             Echo.add(input);
