@@ -98,11 +98,6 @@ public class Echo {
         Echo.echo(e.getMessage());
     }
 
-    /** Method created by Codex: Returns whether the input starts with a complete command keyword. */
-    private static boolean isCommand(String input, String command) {
-        return input.equals(command) || input.startsWith(command + " ");
-    }
-
     /**
      * Method with Codex contribution:
      * Processes one input line, returning whether the user requested the chatbot to exit.
@@ -113,59 +108,56 @@ public class Echo {
      */
     private static boolean processCommand(String input) throws EchoException {
         String trimmedInput = input.trim();
-        if (trimmedInput.equals("bye")) {
-            return true;
+        CommandType cmd = CommandType.fromInput(trimmedInput);
+        String args = trimmedInput.substring(cmd.getKeyword().length()).trim();
+        switch (cmd) {
+            case BYE:
+                return true;
+            case LIST:
+                Echo.list();
+                return false;
+            case MARK:
+                Echo.mark(args);
+                return false;
+            case UNMARK:
+                Echo.unmark(args);
+                return false;
+            case TODO:
+                if (args.isEmpty()) { throw new TodoFormatException(); }
+                Echo.add(new Todo(args));
+                return false;
+            case DEADLINE:
+                String[] deadlineParts = args.split(" /by ", 2);
+                if  (deadlineParts.length != 2) { throw new DeadlineFormatException(); }
+                String deadlineDesc = deadlineParts[0].trim();
+                String dueDate = deadlineParts[1].trim();
+                if (deadlineDesc.isEmpty() || dueDate.isEmpty()) {
+                    throw new DeadlineFormatException();
+                }
+                Echo.add(new Deadline(deadlineDesc, dueDate));
+                return false;
+            case EVENT:
+                String[] eventParts = args.split(" /from | /to ", 3);
+                if  (eventParts.length != 3) { throw new EventFormatException(); }
+                String eventDesc = eventParts[0].trim();
+                String startTime = eventParts[1].trim();
+                String endTime = eventParts[2].trim();
+                if (eventDesc.isEmpty() || startTime.isEmpty() || endTime.isEmpty()) {
+                    throw new EventFormatException();
+                }
+                Echo.add(new Event(eventDesc, startTime, endTime));
+                return false;
+            case DELETE:
+                try {
+                    if (args.isEmpty()) { throw new DeleteFormatException(); }
+                    Echo.delete(Integer.parseInt(args) - 1);
+                    return false;
+                } catch (NumberFormatException e) {
+                    throw new DeleteFormatException();
+                }
+            default:
+                throw new UnknownCommandException();
         }
-        if (trimmedInput.equals("list")) {
-            Echo.list();
-            return false;
-        }
-        if (isCommand(trimmedInput, "unmark")) {
-            String taskNumber = trimmedInput.substring("unmark".length()).trim();
-            Echo.unmark(taskNumber);
-            return false;
-        }
-        if (isCommand(trimmedInput, "mark")) {
-            String taskNumber = trimmedInput.substring("mark".length()).trim();
-            Echo.mark(taskNumber);
-            return false;
-        }
-        if (isCommand(trimmedInput, "todo")) {
-            String description = trimmedInput.substring("todo".length()).trim();
-            if (description.isEmpty()) { throw new TodoFormatException(); }
-            Echo.add(new Todo(description));
-            return false;
-        }
-        if (isCommand(trimmedInput, "deadline")) {
-            String[] parts = trimmedInput.substring("deadline".length()).trim().split(" /by ", 2);
-            if  (parts.length != 2) { throw new DeadlineFormatException(); }
-            String description = parts[0].trim();
-            String dueDate = parts[1].trim();
-            if (description.isEmpty() || dueDate.isEmpty()) {
-                throw new DeadlineFormatException();
-            }
-            Echo.add(new Deadline(description, dueDate));
-            return false;
-        }
-        if (isCommand(trimmedInput, "event")) {
-            String[] parts = trimmedInput.substring("event".length()).trim().split(" /from | /to ", 3);
-            if  (parts.length != 3) { throw new EventFormatException(); }
-            String description = parts[0].trim();
-            String startTime = parts[1].trim();
-            String endTime = parts[2].trim();
-            if (description.isEmpty() || startTime.isEmpty() || endTime.isEmpty()) {
-                throw new EventFormatException();
-            }
-            Echo.add(new Event(description, startTime, endTime));
-            return false;
-        }
-        if (isCommand(trimmedInput, "delete")) {
-            String taskNumber = trimmedInput.substring("delete".length()).trim();
-            if (taskNumber.isEmpty()) { throw new DeleteFormatException(); }
-            Echo.delete(Integer.parseInt(taskNumber) - 1);
-            return false;
-        }
-        throw new UnknownCommandException();
     }
 
     public static void main(String[] args) {
