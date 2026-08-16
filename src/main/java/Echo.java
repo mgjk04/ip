@@ -132,7 +132,13 @@ public class Echo {
                 Echo.add(new Deadline(description, by));
                 continue;
             }
-            Echo.add(new Task(input));
+            if (input.startsWith("event ")) {
+                String[] parts = input.substring(6).split(" /from | /to ");
+                String description = parts[0].trim();
+                String from = parts[1].trim();
+                String to = parts[2].trim();
+                Echo.add(new Event(description, from, to));
+            }
         }
         Echo.farewell();
         scanner.close();
