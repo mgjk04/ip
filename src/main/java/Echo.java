@@ -7,9 +7,7 @@ import java.util.Scanner;
 public class Echo {
     private static final String NAME = "Echo";
     private static final String SEPARATOR = "============================================================";
-    private static final String[] items = new String[100];
-    /** Comment by Codex: Stores whether the task at each corresponding {@code items} index is complete. */
-    private static final boolean[] done = new boolean[100]; //By Codex
+    private static final Task[] tasks = new Task[100]; //Modified by Codex
     private static int itemCnt = 0;
 
 
@@ -35,21 +33,23 @@ public class Echo {
         System.out.println(SEPARATOR);
     }
 
-    private static void add(String item) {
-        if (itemCnt == items.length) {
+    private static void add(String description) {
+        // Method modified by Codex:
+        if (itemCnt == tasks.length) {
             Echo.echo("I can't remember any more! Sorry!");
             return;
         }
-        items[itemCnt++] = item;
-        Echo.echo("added: " + item);
+        tasks[itemCnt++] = new Task(description);
+        Echo.echo("added: " + description);
     }
 
     private static void list() {
-        // Modification by Codex:
+        // Method modified by Codex:
         StringBuilder listTxt = new StringBuilder("Here are the tasks in your list:\n");
         for (int i = 1; i <= itemCnt; ++i) {
-            listTxt.append(i).append(".[").append(done[i - 1] ? "X" : " ")
-                    .append("] ").append(items[i - 1]);
+            Task task = tasks[i - 1];
+            listTxt.append(i).append(".[").append(task.getStatusIcon())
+                    .append("] ").append(task.getDescription());
             if (i != itemCnt) listTxt.append("\n");
         }
         Echo.echo(listTxt.toString());
@@ -68,8 +68,11 @@ public class Echo {
                 Echo.echo("That task number is not in the list.");
                 return;
             }
-            done[taskNumber - 1] = true;
-            Echo.echo("Nice! I've marked this task as done:\n  [X] " + items[taskNumber - 1]);
+            // Hunk modified by Codex:
+            Task task = tasks[taskNumber - 1];
+            task.markAsDone();
+            Echo.echo("Nice! I've marked this task as done:\n  ["
+                    + task.getStatusIcon() + "] " + task.getDescription());
         } catch (NumberFormatException e) {
             Echo.echo("Please provide a task number to mark.");
         }
@@ -88,8 +91,11 @@ public class Echo {
                 Echo.echo("That task number is not in the list.");
                 return;
             }
-            done[taskNumber - 1] = false;
-            Echo.echo("OK, I've marked this task as not done yet:\n  [ ] " + items[taskNumber - 1]);
+            // Hunk modified by Codex:
+            Task task = tasks[taskNumber - 1];
+            task.markAsNotDone();
+            Echo.echo("OK, I've marked this task as not done yet:\n  ["
+                    + task.getStatusIcon() + "] " + task.getDescription());
         } catch (NumberFormatException e) {
             Echo.echo("Please provide a task number to unmark.");
         }
