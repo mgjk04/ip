@@ -35,6 +35,15 @@ public class Echo {
                 + "\nNow you have " + tasks.size() + " tasks in the list.");
     }
 
+    private static void delete(int index) throws EchoException {
+        if (index < 0 || index >= tasks.size()) {
+            throw new InvalidTaskNumberException();
+        }
+        Task t = tasks.remove(index);
+        Echo.echo("Noted. I've removed this task:\n" + t.toString() +
+                "\nNow you have " + tasks.size() + " tasks in the list.");
+    }
+
     private static void list() {
         StringBuilder listTxt = new StringBuilder("Here are the tasks in your list:\n");
         for (int i = 1; i <= tasks.size(); ++i) {
@@ -150,6 +159,12 @@ public class Echo {
             Echo.add(new Event(description, startTime, endTime));
             return false;
         }
+        if (isCommand(trimmedInput, "delete")) {
+            String taskNumber = trimmedInput.substring("delete".length()).trim();
+            if (taskNumber.isEmpty()) { throw new DeleteFormatException(); }
+            Echo.delete(Integer.parseInt(taskNumber) - 1);
+            return false;
+        }
         throw new UnknownCommandException();
     }
 
@@ -159,10 +174,10 @@ public class Echo {
         while (scanner.hasNextLine()) {
             String input = scanner.nextLine();
             try {
-                if (processCommand(input)) { // Modified by Codex
+                if (processCommand(input)) {
                     break;
                 }
-            } catch (EchoException exception) { // Modified by Codex
+            } catch (EchoException exception) {
                 showError(exception);
             }
         }
