@@ -40,7 +40,7 @@ public class Echo {
             return;
         }
         tasks[itemCnt++] = t;
-        Echo.echo("added: " + t.getDescription());
+        Echo.echo("Got it. I've add this task:\n" + t.toString() + "\nNow you have " + itemCnt + " tasks in the list.");
     }
 
     private static void list() {
@@ -110,14 +110,19 @@ public class Echo {
                 Echo.list();
                 continue;
             }
-            // Created by Codex:
-            if (input.equals("unmark") || input.startsWith("unmark ")) {
+            // Code with Codex contribution:
+            if (input.startsWith("unmark ")) {
                 Echo.unmark(input.substring(6).trim());
                 continue;
             }
-            // Created by Codex:
-            if (input.equals("mark") || input.startsWith("mark ")) {
+            // Code with Codex contribution:
+            if (input.startsWith("mark ")) {
                 Echo.mark(input.substring(4).trim());
+                continue;
+            }
+            if (input.startsWith("todo ")) {
+                Task t = new Todo(input.substring(5).trim());
+                Echo.add(t);
                 continue;
             }
             Echo.add(new Task(input));
