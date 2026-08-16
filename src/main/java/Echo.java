@@ -1,10 +1,10 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Echo {
     private static final String NAME = "Echo";
     private static final String SEPARATOR = "============================================================";
-    private static final Task[] tasks = new Task[100]; //Modified by Codex
-    private static int itemCnt = 0;
+    private static final ArrayList<Task> tasks = new ArrayList<>();
 
 
     private static void greet() {
@@ -30,27 +30,23 @@ public class Echo {
     }
 
     private static void add(Task t) throws EchoException {
-        if (itemCnt == tasks.length) {
-            throw new MemoryLimitExceededException(); // Modified by Codex
-        }
-        tasks[itemCnt++] = t;
+        tasks.add(t);
         Echo.echo("Got it. I've added this task:\n" + t.toString()
-                + "\nNow you have " + itemCnt + " tasks in the list.");
+                + "\nNow you have " + tasks.size() + " tasks in the list.");
     }
 
     private static void list() {
-        // Method modified by Codex:
         StringBuilder listTxt = new StringBuilder("Here are the tasks in your list:\n");
-        for (int i = 1; i <= itemCnt; ++i) {
-            Task task = tasks[i - 1];
+        for (int i = 1; i <= tasks.size(); ++i) {
+            Task task = tasks.get(i - 1);
             listTxt.append(i).append(".").append(task.toString());
-            if (i != itemCnt) listTxt.append("\n");
+            if (i != tasks.size()) listTxt.append("\n");
         }
         Echo.echo(listTxt.toString());
     }
 
     /**
-     * Method created by Codex:
+     * Method with Codex contribution:
      * Marks the task at the given one-based task number as complete.
      *
      * @param taskNumberText text supplied after the {@code mark} command
@@ -58,15 +54,14 @@ public class Echo {
     private static void mark(String taskNumberText) throws EchoException {
         try {
             int taskNumber = Integer.parseInt(taskNumberText);
-            if (taskNumber < 1 || taskNumber > itemCnt) {
-                throw new InvalidTaskNumberException(itemCnt);
+            if (taskNumber < 1 || taskNumber > tasks.size()) {
+                throw new InvalidTaskNumberException();
             }
-            // Hunk modified by Codex:
-            Task task = tasks[taskNumber - 1];
+            Task task = tasks.get(taskNumber - 1);
             task.markDone();
             Echo.echo("Nice! I've marked this task as done:\n" + task.toString());
         } catch (NumberFormatException e) {
-            throw new InvalidTaskNumberException(itemCnt);
+            throw new InvalidTaskNumberException();
         }
     }
 
@@ -79,15 +74,14 @@ public class Echo {
     private static void unmark(String taskNumberText) throws EchoException {
         try {
             int taskNumber = Integer.parseInt(taskNumberText);
-            if (taskNumber < 1 || taskNumber > itemCnt) {
-                throw new InvalidTaskNumberException(itemCnt);
+            if (taskNumber < 1 || taskNumber > tasks.size()) {
+                throw new InvalidTaskNumberException();
             }
-            // Code with Codex contribution:
-            Task task = tasks[taskNumber - 1];
+            Task task = tasks.get(taskNumber - 1);
             task.markUnDone();
             Echo.echo("OK, I've marked this task as not done yet:\n" + task.toString());
         } catch (NumberFormatException e) {
-            throw new InvalidTaskNumberException(itemCnt); // Modified by Codex
+            throw new InvalidTaskNumberException();
         }
     }
 
