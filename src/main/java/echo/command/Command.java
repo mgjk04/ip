@@ -1,3 +1,10 @@
+package echo.command;
+
+import echo.exception.EchoException;
+import echo.storage.Storage;
+import echo.task.TaskList;
+import echo.ui.Ui;
+
 /**
  * A user command ready to be executed against the chatbot's components.
  * Each concrete subclass knows both what to do with the task list and how

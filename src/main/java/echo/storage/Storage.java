@@ -1,3 +1,8 @@
+package echo.storage;
+
+import echo.exception.StorageException;
+import echo.task.Task;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

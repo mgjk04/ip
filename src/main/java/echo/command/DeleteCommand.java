@@ -1,3 +1,11 @@
+package echo.command;
+
+import echo.exception.EchoException;
+import echo.storage.Storage;
+import echo.task.Task;
+import echo.task.TaskList;
+import echo.ui.Ui;
+
 /**
  * Removes one task from the list by its zero-based index.
  */

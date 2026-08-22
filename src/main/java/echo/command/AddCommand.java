@@ -1,3 +1,11 @@
+package echo.command;
+
+import echo.exception.EchoException;
+import echo.storage.Storage;
+import echo.task.Task;
+import echo.task.TaskList;
+import echo.ui.Ui;
+
 /**
  * Adds one parsed task to the list and confirms the new task count.
  */

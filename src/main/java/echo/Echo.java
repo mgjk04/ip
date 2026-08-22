@@ -1,3 +1,13 @@
+package echo;
+
+import echo.command.Command;
+import echo.exception.EchoException;
+import echo.exception.StorageException;
+import echo.parser.Parser;
+import echo.storage.Storage;
+import echo.task.TaskList;
+import echo.ui.Ui;
+
 import java.nio.file.Path;
 import java.util.Scanner;
 

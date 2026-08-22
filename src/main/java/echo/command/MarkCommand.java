@@ -1,3 +1,11 @@
+package echo.command;
+
+import echo.exception.EchoException;
+import echo.storage.Storage;
+import echo.task.Task;
+import echo.task.TaskList;
+import echo.ui.Ui;
+
 /**
  * Updates the completion status of the task at a zero-based index.
  * Marking done and marking not done share this class because they differ

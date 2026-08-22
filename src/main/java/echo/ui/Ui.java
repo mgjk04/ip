@@ -1,3 +1,7 @@
+package echo.ui;
+
+import echo.exception.EchoException;
+
 public class Ui {
     private final String NAME;
     private final String SEPARATOR;
