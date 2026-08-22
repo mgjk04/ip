@@ -2,10 +2,30 @@
 
 Run these cases with `python .codex/skills/test-ui/scripts/run_ui_tests.py` from the repository root. Compile the program first with Java 25; the commands below use the current compiled output directory.
 
+Because Echo restores saved tasks at startup, every case deletes the save file before it starts (`rm -rf data &&`), so cases are independent of execution order and leftovers.
+
+## Side effects: automatic saving and startup loading
+
+Every successful `todo`, `deadline`, `event`, `mark`, `unmark`, or `delete` command silently rewrites `./data/echo.txt`, relative to the working directory. The file stores one pipe-delimited line per task: type letter (`T`/`D`/`E`), completion flag (`1` = done / `0` = not done), description, then the deadline's due date or the event's start and end times. Running the "add and list all task types" case from a clean state must leave:
+
+```text
+T | 0 | borrow book
+D | 0 | return book | Sunday
+E | 0 | project meeting | Mon 2pm | 4pm
+```
+
+On startup Echo reads `data/echo.txt` (if present) and restores those tasks before greeting; a missing file starts an empty list, and a malformed line reports a storage error instead of aborting. Task details must not contain `|` because it separates saved fields; inputs that do are rejected outright (see the "pipe characters are rejected" case). To verify persistence manually from a known state:
+
+1. Delete `data/echo.txt`, run one session that adds `todo borrow book`, then quit with `bye`.
+2. Start a new session entering `list`: `[T][ ] borrow book` must appear.
+3. Re-running the same session after `mark 1` must show `[T][X] borrow book`.
+
+Successful saves and loads produce no console output, so the expected transcripts below do not change.
+
 ## Test case: greeting and graceful exit
 
 - **Aim:** Verify that Echo presents its greeting and exits cleanly when the user enters `bye`.
-- **Command:** `java -cp build/classes Echo`
+- **Command:** `rm -rf data && java -cp build/classes Echo`
 - **Inputs:**
 ```text
 bye
@@ -30,7 +50,7 @@ Bye!
 ## Test case: add and list all task types
 
 - **Aim:** Verify that ToDos, Deadlines, and Events are stored polymorphically and displayed in the required format.
-- **Command:** `java -cp build/classes Echo`
+- **Command:** `rm -rf data && java -cp build/classes Echo`
 - **Inputs:**
 ```text
 todo borrow book
@@ -80,7 +100,7 @@ Bye!
 ## Test case: invalid commands show helpful errors
 
 - **Aim:** Verify that Echo catches invalid commands and malformed task inputs without terminating the session.
-- **Command:** `java -cp build/classes Echo`
+- **Command:** `rm -rf data && java -cp build/classes Echo`
 - **Inputs:**
 ```text
 todo
@@ -129,7 +149,7 @@ Bye!
 ## Test case: errors do not change existing tasks
 
 - **Aim:** Verify that rejected commands leave the task list unchanged while valid commands before and after them still work.
-- **Command:** `java -cp build/classes Echo`
+- **Command:** `rm -rf data && java -cp build/classes Echo`
 - **Inputs:**
 ```text
 todo
@@ -198,7 +218,7 @@ Bye!
 ## Test case: malformed task fields do not consume task numbers
 
 - **Aim:** Verify that incomplete deadline and event fields, plus a command with an unrecognised keyword, do not affect later valid tasks or their numbers.
-- **Command:** `java -cp build/classes Echo`
+- **Command:** `rm -rf data && java -cp build/classes Echo`
 - **Inputs:**
 ```text
 deadline plan /by
@@ -258,7 +278,7 @@ Bye!
 ## Test case: delete a task and renumber the remaining list
 
 - **Aim:** Verify that `delete` removes the specified task, reports the new task count, and leaves the remaining tasks in their correct order with consecutive list numbers.
-- **Command:** `java -cp build/classes Echo`
+- **Command:** `rm -rf data && java -cp build/classes Echo`
 - **Inputs:**
 ```text
 todo read book
@@ -311,6 +331,85 @@ Here are the tasks in your list:
 1.[T][ ] read book
 2.[D][ ] return book (by: June 6th)
 3.[T][ ] borrow book
+============================================================
+============================================================
+Bye!
+============================================================
+```
+
+## Test case: missing task numbers report format errors
+
+- **Aim:** Verify that mark, unmark, and delete without a task number each report their command-specific format error instead of the generic invalid-number message.
+- **Command:** `rm -rf data && java -cp build/classes Echo`
+- **Inputs:**
+```text
+mark
+unmark
+delete
+bye
+```
+- **Expected output:**
+```text
+============================================================
+ _____     _           
+| ____|___| |__   ___  
+|  _| / __| '_ \ / _ \ 
+| |__| (__| | | | (_) |
+|_____\___|_| |_|\___/ 
+
+Hello! I'm Echo.
+How can I help?
+============================================================
+============================================================
+OOPS!!! Invalid mark command. Format: mark <taskNumber>
+============================================================
+============================================================
+OOPS!!! Invalid unmark command. Format: unmark <taskNumber>
+============================================================
+============================================================
+OOPS!!! Invalid delete command. Format: delete <taskNumber>
+============================================================
+============================================================
+Bye!
+============================================================
+```
+
+## Test case: pipe characters are rejected
+
+- **Aim:** Verify that task details containing the reserved save-file separator '|' are rejected for every task type and leave the list unchanged.
+- **Command:** `rm -rf data && java -cp build/classes Echo`
+- **Inputs:**
+```text
+todo evil | plan
+deadline x /by Sun|day
+event y /from a|b /to c
+list
+bye
+```
+- **Expected output:**
+```text
+============================================================
+ _____     _           
+| ____|___| |__   ___  
+|  _| / __| '_ \ / _ \ 
+| |__| (__| | | | (_) |
+|_____\___|_| |_|\___/ 
+
+Hello! I'm Echo.
+How can I help?
+============================================================
+============================================================
+OOPS!!! '|' cannot be used because it separates fields in the save file.
+============================================================
+============================================================
+OOPS!!! '|' cannot be used because it separates fields in the save file.
+============================================================
+============================================================
+OOPS!!! '|' cannot be used because it separates fields in the save file.
+============================================================
+============================================================
+Here are the tasks in your list:
+
 ============================================================
 ============================================================
 Bye!
