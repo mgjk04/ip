@@ -1,3 +1,5 @@
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -157,28 +159,39 @@ public class Echo {
                 String[] deadlineParts = args.split(" /by ", 2);
                 if  (deadlineParts.length != 2) { throw new DeadlineFormatException(); }
                 String deadlineDesc = deadlineParts[0].trim();
-                String dueDate = deadlineParts[1].trim();
-                if (deadlineDesc.isEmpty() || dueDate.isEmpty()) {
+                String dueDateTime = deadlineParts[1].trim();
+                if (deadlineDesc.isEmpty() || dueDateTime.isEmpty()) {
                     throw new DeadlineFormatException();
                 }
                 requireSavable(deadlineDesc);
-                requireSavable(dueDate);
-                add(new Deadline(deadlineDesc, dueDate));
-                return false;
+                requireSavable(dueDateTime);
+                try {
+                    LocalDateTime by = LocalDateTime.parse(dueDateTime, DateTimeUtility.INPUT);
+                    add(new Deadline(deadlineDesc, by));
+                    return false;
+                } catch (DateTimeParseException e) {
+                    throw new DeadlineFormatException();
+                }
             case EVENT:
                 String[] eventParts = args.split(" /from | /to ", 3);
                 if  (eventParts.length != 3) { throw new EventFormatException(); }
                 String eventDesc = eventParts[0].trim();
-                String startTime = eventParts[1].trim();
-                String endTime = eventParts[2].trim();
-                if (eventDesc.isEmpty() || startTime.isEmpty() || endTime.isEmpty()) {
+                String startDateTime = eventParts[1].trim();
+                String endDateTime = eventParts[2].trim();
+                if (eventDesc.isEmpty() || startDateTime.isEmpty() || endDateTime.isEmpty()) {
                     throw new EventFormatException();
                 }
                 requireSavable(eventDesc);
-                requireSavable(startTime);
-                requireSavable(endTime);
-                add(new Event(eventDesc, startTime, endTime));
-                return false;
+                requireSavable(startDateTime);
+                requireSavable(endDateTime);
+                try {
+                    LocalDateTime from = LocalDateTime.parse(startDateTime, DateTimeUtility.INPUT);
+                    LocalDateTime to = LocalDateTime.parse(endDateTime, DateTimeUtility.INPUT);
+                    add(new Event(eventDesc, from, to));
+                    return false;
+                } catch (DateTimeParseException e) {
+                    throw new EventFormatException();
+                }
             case DELETE:
                 try {
                     if (args.isEmpty()) { throw new DeleteFormatException(); }
