@@ -1,9 +1,8 @@
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Echo {
-    private final ArrayList<Task> tasks = new ArrayList<>();
+    private final TaskList taskList = new TaskList();
     private final Ui ui = new Ui();
     private final Storage storage;
     private final Parser parser = new Parser();
@@ -24,30 +23,21 @@ public class Echo {
     }
 
     private void add(Task t) throws EchoException {
-        tasks.add(t);
-        storage.save(tasks);
+        taskList.add(t);
+        storage.save(taskList.getAll());
         ui.echo("Got it. I've added this task:\n" + t.toString()
-                + "\nNow you have " + tasks.size() + " tasks in the list.");
+                + "\nNow you have " + taskList.size() + " tasks in the list.");
     }
 
     private void delete(int index) throws EchoException {
-        if (index < 0 || index >= tasks.size()) {
-            throw new InvalidTaskNumberException();
-        }
-        Task t = tasks.remove(index);
-        storage.save(tasks);
+        Task t = taskList.delete(index);
+        storage.save(taskList.getAll());
         ui.echo("Noted. I've removed this task:\n" + t.toString() +
-                "\nNow you have " + tasks.size() + " tasks in the list.");
+                "\nNow you have " + taskList.size() + " tasks in the list.");
     }
 
     private void list() {
-        StringBuilder listTxt = new StringBuilder("Here are the tasks in your list:\n");
-        for (int i = 1; i <= tasks.size(); ++i) {
-            Task task = tasks.get(i - 1);
-            listTxt.append(i).append(".").append(task.toString());
-            if (i != tasks.size()) listTxt.append("\n");
-        }
-        ui.echo(listTxt.toString());
+        ui.echo(taskList.asListText());
     }
 
     /**
@@ -57,9 +47,9 @@ public class Echo {
      * @param taskIndex zero-based index of the task to mark
      */
     private void mark(int taskIndex) throws EchoException {
-        Task task = getTask(taskIndex);
+        Task task = taskList.getTask(taskIndex);
         task.markDone();
-        storage.save(tasks);
+        storage.save(taskList.getAll());
         ui.echo("Nice! I've marked this task as done:\n" + task.toString());
     }
 
@@ -70,25 +60,10 @@ public class Echo {
      * @param taskIndex zero-based index of the task to unmark
      */
     private void unmark(int taskIndex) throws EchoException {
-        Task task = getTask(taskIndex);
+        Task task = taskList.getTask(taskIndex);
         task.markUnDone();
-        storage.save(tasks);
+        storage.save(taskList.getAll());
         ui.echo("OK, I've marked this task as not done yet:\n" + task.toString());
-    }
-    /**
-     * Returns the task at the parsed index after checking it against the
-     * current task list. Parser cannot do this check because it does not own
-     * the list.
-     *
-     * @param taskIndex zero-based task index from a command
-     * @return referenced task
-     * @throws InvalidTaskNumberException when the index is not in the list
-     */
-    private Task getTask(int taskIndex) throws InvalidTaskNumberException {
-        if (taskIndex < 0 || taskIndex >= tasks.size()) {
-            throw new InvalidTaskNumberException();
-        }
-        return tasks.get(taskIndex);
     }
 
     /**
@@ -127,7 +102,7 @@ public class Echo {
     private void run() {
         Scanner scanner = new Scanner(System.in);
         try {
-            tasks.addAll(storage.read());
+            taskList.addAll(storage.read());
         } catch (StorageException e) {
             ui.showError(e);
         }
