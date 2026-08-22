@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 /**
  * File with Codex contribution:
  * Represents a task description and whether the task has been completed.

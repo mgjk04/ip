@@ -14,7 +14,7 @@ D | 0 | return book | Sunday
 E | 0 | project meeting | Mon 2pm | 4pm
 ```
 
-On startup Echo reads `data/echo.txt` (if present) and restores those tasks before greeting; a missing file starts an empty list, and a malformed line reports a storage error instead of aborting. To verify persistence manually from a known state:
+On startup Echo reads `data/echo.txt` (if present) and restores those tasks before greeting; a missing file starts an empty list, and a malformed line reports a storage error instead of aborting. Task details must not contain `|` because it separates saved fields; inputs that do are rejected outright (see the "pipe characters are rejected" case). To verify persistence manually from a known state:
 
 1. Delete `data/echo.txt`, run one session that adds `todo borrow book`, then quit with `bye`.
 2. Start a new session entering `list`: `[T][ ] borrow book` must appear.
@@ -331,6 +331,85 @@ Here are the tasks in your list:
 1.[T][ ] read book
 2.[D][ ] return book (by: June 6th)
 3.[T][ ] borrow book
+============================================================
+============================================================
+Bye!
+============================================================
+```
+
+## Test case: missing task numbers report format errors
+
+- **Aim:** Verify that mark, unmark, and delete without a task number each report their command-specific format error instead of the generic invalid-number message.
+- **Command:** `rm -rf data && java -cp build/classes Echo`
+- **Inputs:**
+```text
+mark
+unmark
+delete
+bye
+```
+- **Expected output:**
+```text
+============================================================
+ _____     _           
+| ____|___| |__   ___  
+|  _| / __| '_ \ / _ \ 
+| |__| (__| | | | (_) |
+|_____\___|_| |_|\___/ 
+
+Hello! I'm Echo.
+How can I help?
+============================================================
+============================================================
+OOPS!!! Invalid mark command. Format: mark <taskNumber>
+============================================================
+============================================================
+OOPS!!! Invalid unmark command. Format: unmark <taskNumber>
+============================================================
+============================================================
+OOPS!!! Invalid delete command. Format: delete <taskNumber>
+============================================================
+============================================================
+Bye!
+============================================================
+```
+
+## Test case: pipe characters are rejected
+
+- **Aim:** Verify that task details containing the reserved save-file separator '|' are rejected for every task type and leave the list unchanged.
+- **Command:** `rm -rf data && java -cp build/classes Echo`
+- **Inputs:**
+```text
+todo evil | plan
+deadline x /by Sun|day
+event y /from a|b /to c
+list
+bye
+```
+- **Expected output:**
+```text
+============================================================
+ _____     _           
+| ____|___| |__   ___  
+|  _| / __| '_ \ / _ \ 
+| |__| (__| | | | (_) |
+|_____\___|_| |_|\___/ 
+
+Hello! I'm Echo.
+How can I help?
+============================================================
+============================================================
+OOPS!!! '|' cannot be used because it separates fields in the save file.
+============================================================
+============================================================
+OOPS!!! '|' cannot be used because it separates fields in the save file.
+============================================================
+============================================================
+OOPS!!! '|' cannot be used because it separates fields in the save file.
+============================================================
+============================================================
+Here are the tasks in your list:
+
 ============================================================
 ============================================================
 Bye!

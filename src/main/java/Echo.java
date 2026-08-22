@@ -63,18 +63,10 @@ public class Echo {
      * @param taskNumberText text supplied after the {@code mark} command
      */
     private void mark(String taskNumberText) throws EchoException {
-        try {
-            int taskNumber = Integer.parseInt(taskNumberText);
-            if (taskNumber < 1 || taskNumber > tasks.size()) {
-                throw new InvalidTaskNumberException();
-            }
-            Task task = tasks.get(taskNumber - 1);
-            task.markDone();
-            storage.save(tasks);
-            echo("Nice! I've marked this task as done:\n" + task.toString());
-        } catch (NumberFormatException e) {
-            throw new InvalidTaskNumberException();
-        }
+        Task task = tasks.get(resolveTaskIndex(CommandType.MARK, taskNumberText));
+        task.markDone();
+        storage.save(tasks);
+        echo("Nice! I've marked this task as done:\n" + task.toString());
     }
 
     /**
@@ -84,15 +76,31 @@ public class Echo {
      * @param taskNumberText text supplied after the {@code unmark} command
      */
     private void unmark(String taskNumberText) throws EchoException {
+        Task task = tasks.get(resolveTaskIndex(CommandType.UNMARK, taskNumberText));
+        task.markUnDone();
+        storage.save(tasks);
+        echo("OK, I've marked this task as not done yet:\n" + task.toString());
+    }
+
+    /**
+     * Parses the text following a mark or unmark command into the zero-based
+     * index of an existing task.
+     *
+     * @param command command, used in error messages
+     * @param taskNumberStr text supplied after the command
+     * @return zero-based list index of the referenced task
+     * @throws EchoException when the number is missing, malformed, or out of range
+     */
+    private int resolveTaskIndex(CommandType command, String taskNumberStr) throws EchoException {
+        if (taskNumberStr.isEmpty()) {
+            throw new TaskNumberFormatException(command);
+        }
         try {
-            int taskNumber = Integer.parseInt(taskNumberText);
+            int taskNumber = Integer.parseInt(taskNumberStr);
             if (taskNumber < 1 || taskNumber > tasks.size()) {
                 throw new InvalidTaskNumberException();
             }
-            Task task = tasks.get(taskNumber - 1);
-            task.markUnDone();
-            storage.save(tasks);
-            echo("OK, I've marked this task as not done yet:\n" + task.toString());
+            return taskNumber - 1;
         } catch (NumberFormatException e) {
             throw new InvalidTaskNumberException();
         }
@@ -100,6 +108,20 @@ public class Echo {
 
     private void showError(EchoException e) {
         echo(e.getMessage());
+    }
+
+    /**
+     * Rejects task details containing the pipe character, which is reserved
+     * as the field separator in the save file; a saved task containing it
+     * could not be loaded again.
+     *
+     * @param detail one user-supplied task field
+     * @throws EchoException when the detail contains a pipe character
+     */
+    private void requireSavable(String detail) throws EchoException {
+        if (detail.contains("|")) {
+            throw new EchoException("'|' cannot be used because it separates fields in the save file.");
+        }
     }
 
     /**
@@ -128,6 +150,7 @@ public class Echo {
                 return false;
             case TODO:
                 if (args.isEmpty()) { throw new TodoFormatException(); }
+                requireSavable(args);
                 add(new Todo(args));
                 return false;
             case DEADLINE:
@@ -138,6 +161,8 @@ public class Echo {
                 if (deadlineDesc.isEmpty() || dueDate.isEmpty()) {
                     throw new DeadlineFormatException();
                 }
+                requireSavable(deadlineDesc);
+                requireSavable(dueDate);
                 add(new Deadline(deadlineDesc, dueDate));
                 return false;
             case EVENT:
@@ -149,6 +174,9 @@ public class Echo {
                 if (eventDesc.isEmpty() || startTime.isEmpty() || endTime.isEmpty()) {
                     throw new EventFormatException();
                 }
+                requireSavable(eventDesc);
+                requireSavable(startTime);
+                requireSavable(endTime);
                 add(new Event(eventDesc, startTime, endTime));
                 return false;
             case DELETE:
