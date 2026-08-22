@@ -12,8 +12,7 @@ import java.util.Scanner;
  * {@code D | 1 | return book | Sunday}.
  */
 public class Storage {
-    private static final Path PROJECT_DIR = Path.of(System.getProperty("user.dir"));
-    private static final Path SAVE_FILE = Path.of(PROJECT_DIR.toString(), "data", "echo.txt");
+    private static final Path SAVE_FILE = Path.of("data", "echo.txt");
 
     /**
      * Overwrites the save file with one line per task, creating the

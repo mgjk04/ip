@@ -1,5 +1,6 @@
 public class TaskNumberFormatException extends EchoException {
     public TaskNumberFormatException(CommandType command) {
-        super("Invalid " + command.name() + " command. Format: " + command + " <taskNumber>");
+        String keyword = command.getKeyword();
+        super("Invalid " + keyword + " command. Format: " + keyword + " <taskNumber>");
     }
 }
