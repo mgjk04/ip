@@ -12,8 +12,24 @@ import java.util.Scanner;
  * {@code D | 1 | return book | Sunday}.
  */
 public class Storage {
-    private static final Path SAVE_FILE = Path.of("data", "echo.txt");
+    private final Path SAVE_FILE;
 
+    /**
+     * Instantiates the {@link Storage} class with default
+     * save file path.
+     */
+    public Storage() {
+        this.SAVE_FILE = Path.of("data", "echo.txt");
+    }
+
+    /**
+     * Instantiates the {@link Storage} class with custom
+     * save file path.
+     * @param fileSavePath {@link Path} of save file
+     */
+    public Storage(Path fileSavePath) {
+        this.SAVE_FILE = fileSavePath;
+    }
     /**
      * Overwrites the save file with one line per task, creating the
      * {@code data} directory first if it does not exist yet.

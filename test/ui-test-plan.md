@@ -1,8 +1,8 @@
 # Console UI test plan
 
-Run these cases with `python .opencode/skills/test-ui/scripts/run_ui_tests.py` from the repository root. Compile the program first with Java 25 (`javac -d build/classes $(find src/main/java -name "*.java")`).
+Run these cases with `python .codex/skills/test-ui/scripts/run_ui_tests.py` from the repository root. Compile the program first with Java 25.
 
-Because Echo restores saved tasks at startup, every case deletes the save file before it starts (`rm -rf data &&`), so cases are independent of execution order and leftovers.
+Because Echo restores saved tasks at startup, every case deletes the `data` directory before it starts, so cases are independent of execution order and leftovers.
 
 ## Dates and times (Level-8)
 
@@ -28,7 +28,7 @@ Successful saves and loads produce no console output, so the expected transcript
 ## Test case: greeting and graceful exit
 
 - **Aim:** Verify that Echo presents its greeting and exits cleanly when the user enters `bye`.
-- **Command:** `rm -rf data && java -cp build/classes Echo`
+- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes Echo`
 - **Inputs:**
 ```text
 bye
@@ -53,7 +53,7 @@ Bye!
 ## Test case: add and list all task types
 
 - **Aim:** Verify that ToDos, Deadlines, and Events are stored polymorphically, accept `yyyy-MM-dd HHmm` dates, and display them reformatted.
-- **Command:** `rm -rf data && java -cp build/classes Echo`
+- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes Echo`
 - **Inputs:**
 ```text
 todo borrow book
@@ -103,7 +103,7 @@ Bye!
 ## Test case: invalid commands show helpful errors
 
 - **Aim:** Verify that Echo catches invalid commands and malformed task inputs without terminating the session.
-- **Command:** `rm -rf data && java -cp build/classes Echo`
+- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes Echo`
 - **Inputs:**
 ```text
 todo
@@ -152,7 +152,7 @@ Bye!
 ## Test case: errors do not change existing tasks
 
 - **Aim:** Verify that rejected commands, including dates in an invalid format such as month 13, leave the task list unchanged while valid commands before and after them still work.
-- **Command:** `rm -rf data && java -cp build/classes Echo`
+- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes Echo`
 - **Inputs:**
 ```text
 todo
@@ -225,7 +225,7 @@ Bye!
 ## Test case: malformed task fields do not consume task numbers
 
 - **Aim:** Verify that unparseable or incomplete deadline and event fields, plus a command with an unrecognised keyword, do not affect later valid tasks or their numbers.
-- **Command:** `rm -rf data && java -cp build/classes Echo`
+- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes Echo`
 - **Inputs:**
 ```text
 deadline plan /by someday
@@ -285,7 +285,7 @@ Bye!
 ## Test case: delete a task and renumber the remaining list
 
 - **Aim:** Verify that `delete` removes the specified task, reports the new task count, and leaves the remaining tasks in their correct order with consecutive list numbers.
-- **Command:** `rm -rf data && java -cp build/classes Echo`
+- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes Echo`
 - **Inputs:**
 ```text
 todo read book
@@ -347,7 +347,7 @@ Bye!
 ## Test case: missing task numbers report format errors
 
 - **Aim:** Verify that mark, unmark, and delete without a task number each report their command-specific format error instead of the generic invalid-number message.
-- **Command:** `rm -rf data && java -cp build/classes Echo`
+- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes Echo`
 - **Inputs:**
 ```text
 mark
@@ -384,7 +384,7 @@ Bye!
 ## Test case: pipe characters are rejected
 
 - **Aim:** Verify that task details containing the reserved save-file separator '|' are rejected for every task type and leave the list unchanged.
-- **Command:** `rm -rf data && java -cp build/classes Echo`
+- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes Echo`
 - **Inputs:**
 ```text
 todo evil | plan
@@ -426,7 +426,7 @@ Bye!
 ## Test case: date values are validated and formatted
 
 - **Aim:** Verify that Level-8 date handling rejects unsupported formats (the slash style `2/12/2019 1800`, non-date words, and dates without a time) for both deadlines and events, keeps the list unchanged, and shows accepted dates in a friendlier format than they were entered.
-- **Command:** `rm -rf data && java -cp build/classes Echo`
+- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes Echo`
 - **Inputs:**
 ```text
 deadline return book /by 2/12/2019 1800
@@ -472,7 +472,7 @@ Bye!
 ## Test case: corrupted save lines report storage errors on load
 
 - **Aim:** Verify that a saved line containing an unparsable date is reported at startup as a storage error instead of crashing, after which the session continues with the remaining valid tasks discarded.
-- **Command:** `mkdir -p data && printf 'T | 0 | read book\nD | 1 | return book | Sunday\n' > data/echo.txt && java -cp build/classes Echo`
+- **Command:** `(if exist data rmdir /s /q data) & mkdir data & (echo T ^| 0 ^| read book>data\echo.txt) & (echo D ^| 1 ^| return book ^| Sunday>>data\echo.txt) & java -cp build/classes Echo`
 - **Inputs:**
 ```text
 list
