@@ -1,3 +1,9 @@
+package echo.command;
+
+import echo.storage.Storage;
+import echo.task.TaskList;
+import echo.ui.Ui;
+
 /**
  * Ends the chatbot session.
  */

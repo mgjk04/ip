@@ -1,3 +1,5 @@
+package echo.utils;
+
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
