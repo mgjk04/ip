@@ -2,13 +2,13 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
 /**
- * Converts a line entered by the user into a validated {@link Command}.
- * It only interprets the input; operations on the task list belong to
- * {@link Echo} because only Echo knows which tasks currently exist.
+ * Converts a line entered by the user into an executable {@link Command}.
+ * It validates the input and builds the matching command object; running
+ * the command against the task list happens later in {@link Command#execute}.
  */
 public class Parser {
     /**
-     * Parses one user-input line into a command and its validated data.
+     * Parses one user-input line into a ready-to-run command.
      *
      * @param input command line entered by the user
      * @return a command ready for Echo to execute
@@ -16,16 +16,22 @@ public class Parser {
      */
     public Command parse(String input) throws EchoException {
         String trimmedInput = input.trim();
-        CommandType type = CommandType.fromInput(trimmedInput);
-        String arguments = trimmedInput.substring(type.getKeyword().length()).trim();
+        String keyword = trimmedInput.split(" ", 2)[0];
+        String arguments = trimmedInput.substring(keyword.length()).trim();
 
-        return switch (type) {
-        case BYE, LIST -> new Command(type);
-        case MARK, UNMARK -> new Command(type, parseTaskIndex(type, arguments));
-        case TODO -> parseTodo(arguments);
-        case DEADLINE -> parseDeadline(arguments);
-        case EVENT -> parseEvent(arguments);
-        case DELETE -> new Command(type, parseDeleteIndex(arguments));
+        return switch (keyword) {
+        case "bye" -> new ExitCommand();
+        case "list" -> new ListCommand();
+        case "todo" -> parseTodo(arguments);
+        case "deadline" -> parseDeadline(arguments);
+        case "event" -> parseEvent(arguments);
+        case "mark" -> new MarkCommand(parseIndex(arguments,
+                new TaskNumberFormatException("mark"), new InvalidTaskNumberException()), true);
+        case "unmark" -> new MarkCommand(parseIndex(arguments,
+                new TaskNumberFormatException("unmark"), new InvalidTaskNumberException()), false);
+        case "delete" -> new DeleteCommand(parseIndex(arguments,
+                new DeleteFormatException(), new DeleteFormatException()));
+        default -> throw new UnknownCommandException();
         };
     }
 
@@ -34,7 +40,7 @@ public class Parser {
             throw new TodoFormatException();
         }
         requireSavable(arguments);
-        return new Command(CommandType.TODO, new Todo(arguments));
+        return new AddCommand(new Todo(arguments));
     }
 
     private Command parseDeadline(String arguments) throws EchoException {
@@ -53,7 +59,7 @@ public class Parser {
 
         try {
             LocalDateTime by = LocalDateTime.parse(dueDateTime, DateTimeUtility.INPUT);
-            return new Command(CommandType.DEADLINE, new Deadline(description, by));
+            return new AddCommand(new Deadline(description, by));
         } catch (DateTimeParseException exception) {
             throw new DeadlineFormatException();
         }
@@ -82,31 +88,32 @@ public class Parser {
         try {
             LocalDateTime from = LocalDateTime.parse(startDateTime, DateTimeUtility.INPUT);
             LocalDateTime to = LocalDateTime.parse(endDateTime, DateTimeUtility.INPUT);
-            return new Command(CommandType.EVENT, new Event(description, from, to));
+            return new AddCommand(new Event(description, from, to));
         } catch (DateTimeParseException exception) {
             throw new EventFormatException();
         }
     }
 
-    private int parseTaskIndex(CommandType type, String taskNumberText) throws EchoException {
+    /**
+     * Converts a one-based task number into a zero-based index. Mark,
+     * unmark, and delete share this method because they differ only in
+     * which errors their format messages describe.
+     *
+     * @param taskNumberText raw text following the command keyword
+     * @param emptyError error for a missing number, e.g. {@code mark} alone
+     * @param invalidError error for text that is not a whole number
+     * @return zero-based index into the task list
+     * @throws EchoException using the supplied errors when the text is unusable
+     */
+    private int parseIndex(String taskNumberText, EchoException emptyError, EchoException invalidError)
+            throws EchoException {
         if (taskNumberText.isEmpty()) {
-            throw new TaskNumberFormatException(type);
+            throw emptyError;
         }
         try {
             return Integer.parseInt(taskNumberText) - 1;
         } catch (NumberFormatException exception) {
-            throw new InvalidTaskNumberException();
-        }
-    }
-
-    private int parseDeleteIndex(String taskNumberText) throws EchoException {
-        if (taskNumberText.isEmpty()) {
-            throw new DeleteFormatException();
-        }
-        try {
-            return Integer.parseInt(taskNumberText) - 1;
-        } catch (NumberFormatException exception) {
-            throw new DeleteFormatException();
+            throw invalidError;
         }
     }
 
