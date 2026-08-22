@@ -2,6 +2,18 @@
 
 Run these cases with `python .codex/skills/test-ui/scripts/run_ui_tests.py` from the repository root. Compile the program first with Java 25; the commands below use the current compiled output directory.
 
+## Side effect: automatic saving
+
+Every successful `todo`, `deadline`, `event`, `mark`, `unmark`, or `delete` command silently rewrites `./data/echo.txt`, relative to the working directory. The file stores one pipe-delimited line per task: type letter (`T`/`D`/`E`), completion flag (`1` = done / `0` = not done), description, then the deadline's due date or the event's start and end times. Running the "add and list all task types" case from a clean state must leave:
+
+```text
+T | 0 | borrow book
+D | 0 | return book | Sunday
+E | 0 | project meeting | Mon 2pm | 4pm
+```
+
+To inspect this side effect from a known state, delete `data/echo.txt` before re-running a case. Successful saves produce no console output, so the expected transcripts below do not change.
+
 ## Test case: greeting and graceful exit
 
 - **Aim:** Verify that Echo presents its greeting and exits cleanly when the user enters `bye`.

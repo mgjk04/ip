@@ -26,6 +26,16 @@ public class Task {
         isDone = false;
     }
 
+    /**
+     * Returns this task's details in the pipe-delimited save-file format:
+     * a {@code 1}/{@code 0} completion flag followed by the description,
+     * e.g., {@code 1 | read book}. Subclasses prepend their type letter
+     * and append any extra fields.
+     */
+    public String toSaveFormat() {
+        return (this.isDone ? "1" : "0") + " | " + description;
+    }
+
     @Override
     public String toString() {
         return "[" + (this.isDone ? "X" : " ") + "] " + description;

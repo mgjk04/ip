@@ -5,6 +5,7 @@ public class Echo {
     private static final String NAME = "Echo";
     private static final String SEPARATOR = "============================================================";
     private final ArrayList<Task> tasks = new ArrayList<>();
+    private final Storage storage = new Storage();
 
     private void greet() {
         String banner = " _____     _           \n"
@@ -30,6 +31,7 @@ public class Echo {
 
     private void add(Task t) throws EchoException {
         tasks.add(t);
+        storage.save(tasks);
         echo("Got it. I've added this task:\n" + t.toString()
                 + "\nNow you have " + tasks.size() + " tasks in the list.");
     }
@@ -39,6 +41,7 @@ public class Echo {
             throw new InvalidTaskNumberException();
         }
         Task t = tasks.remove(index);
+        storage.save(tasks);
         echo("Noted. I've removed this task:\n" + t.toString() +
                 "\nNow you have " + tasks.size() + " tasks in the list.");
     }
@@ -67,6 +70,7 @@ public class Echo {
             }
             Task task = tasks.get(taskNumber - 1);
             task.markDone();
+            storage.save(tasks);
             echo("Nice! I've marked this task as done:\n" + task.toString());
         } catch (NumberFormatException e) {
             throw new InvalidTaskNumberException();
@@ -87,6 +91,7 @@ public class Echo {
             }
             Task task = tasks.get(taskNumber - 1);
             task.markUnDone();
+            storage.save(tasks);
             echo("OK, I've marked this task as not done yet:\n" + task.toString());
         } catch (NumberFormatException e) {
             throw new InvalidTaskNumberException();
