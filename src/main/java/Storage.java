@@ -3,6 +3,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * Saves the task list to a file on disk.
@@ -19,9 +20,9 @@ public class Storage {
      * {@code data} directory first if it does not exist yet.
      *
      * @param tasks list of tasks to write to the save file
-     * @throws EchoException when writing to the save file fails
+     * @throws StorageException when writing to the save file fails
      */
-    public void save(List<Task> tasks) throws EchoException {
+    public void save(List<Task> tasks) throws StorageException {
         List<String> lines = new ArrayList<>();
         for (Task t : tasks) {
             lines.add(t.toSaveFormat());
@@ -30,7 +31,34 @@ public class Storage {
             Files.createDirectories(SAVE_FILE.getParent());
             Files.write(SAVE_FILE, lines);
         } catch (IOException e) {
-            throw new EchoException("I could not save your tasks to " + SAVE_FILE + ".");
+            throw new StorageException("I could not save your tasks to " + SAVE_FILE + ".");
+        }
+    }
+
+    /**
+     * Reads the save file line by line and lets each task class reconstruct
+     * itself from its own line (see {@link Task#fromSaveFormat(String)}).
+     * A missing save file is treated as an empty task list so that the
+     * chatbot starts cleanly on first use.
+     *
+     * @return tasks restored from the save file
+     * @throws StorageException when reading fails or a line is malformed
+     */
+    public ArrayList<Task> read() throws StorageException {
+        ArrayList<Task> tasks = new ArrayList<>();
+        if (!Files.exists(SAVE_FILE)) {
+            return tasks;
+        }
+        try (Scanner scanner = new Scanner(SAVE_FILE)) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine().trim();
+                if (!line.isEmpty()) {
+                    tasks.add(Task.fromSaveFormat(line));
+                }
+            }
+            return tasks;
+        } catch (IOException e) {
+            throw new StorageException("I could not read your tasks at " + SAVE_FILE + ".");
         }
     }
 }

@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /**
  * File with Codex contribution:
  * Represents a task description and whether the task has been completed.
@@ -34,6 +36,36 @@ public class Task {
      */
     public String toSaveFormat() {
         return (this.isDone ? "1" : "0") + " | " + description;
+    }
+
+    /**
+     * Reconstructs a task from one of its save-file lines, e.g.,
+     * {@code D | 1 | return book | Sunday} becomes a completed Deadline.
+     * Dispatches on the leading type letter to the matching subclass,
+     * which validates and interprets its remaining fields.
+     *
+     * @param saveFormat one pipe-delimited line written by {@link #toSaveFormat()}
+     * @return the reconstructed task, marked done when its flag is {@code 1}
+     * @throws StorageException when the line does not follow the save format
+     */
+    public static Task fromSaveFormat(String saveFormat) throws StorageException {
+        String[] fields = saveFormat.split(" \\| ");
+        if (fields.length < 3 || fields[1].isEmpty() || fields[2].isEmpty()
+                || !(fields[1].equals("0") || fields[1].equals("1"))) {
+            throw new CorruptFormatException(saveFormat);
+        }
+        try {
+            Task task = switch (fields[0]) {
+                case "T" -> Todo.fromSaveFormat(fields);
+                case "D" -> Deadline.fromSaveFormat(fields);
+                case "E" -> Event.fromSaveFormat(fields);
+                default -> throw new CorruptFormatException(saveFormat);
+            };
+            if (fields[1].equals("1")) { task.markDone(); }
+            return task;
+        } catch (IllegalArgumentException e) {
+            throw new CorruptFormatException(saveFormat);
+        }
     }
 
     @Override

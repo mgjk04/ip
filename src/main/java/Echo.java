@@ -165,12 +165,17 @@ public class Echo {
     }
 
     /**
-     * Runs the chatbot: greets the user, then reads and processes one command
-     * per line until the user enters {@code bye} or input ends. Finally,
-     * print farewell.
+     * Runs the chatbot: loads any previously saved tasks, greets the user,
+     * then reads and processes one command per line until the user enters
+     * {@code bye} or input ends. Finally, print farewell.
      */
     private void run() {
         Scanner scanner = new Scanner(System.in);
+        try {
+            tasks.addAll(storage.read());
+        } catch (StorageException e) {
+            showError(e);
+        }
         greet();
         while (scanner.hasNextLine()) {
             String input = scanner.nextLine();
