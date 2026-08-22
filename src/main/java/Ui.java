@@ -58,7 +58,7 @@ public class Ui {
      * Shows the error message related to an {@link EchoException}.
      * @param e {@link EchoException} which error message to display
      */
-    private void showError(EchoException e) {
+    public void showError(EchoException e) {
         echo(e.getMessage());
     }
 

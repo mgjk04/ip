@@ -1,40 +1,32 @@
-import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Echo {
-    private static final String NAME = "Echo";
-    private static final String SEPARATOR = "============================================================";
     private final ArrayList<Task> tasks = new ArrayList<>();
-    private final Storage storage = new Storage();
-
-    private void greet() {
-        String banner = " _____     _           \n"
-                      + "| ____|___| |__   ___  \n"
-                      + "|  _| / __| '_ \\ / _ \\ \n"
-                      + "| |__| (__| | | | (_) |\n"
-                      + "|_____\\___|_| |_|\\___/ \n";
-        String salutation = "Hello! I'm " + NAME + ".\n" +
-                          "How can I help?";
-        echo(banner + "\n" + salutation);
+    private final Ui ui = new Ui();
+    private final Storage storage;
+    private final Parser parser = new Parser();
+    /**
+     * Instantiates {@link Echo} chatbot instance with default
+     * parameters.
+     */
+    public Echo() {
+        this.storage = new Storage();
     }
 
-    private void farewell() {
-        String valediction = "Bye!";
-        echo(valediction);
-    }
-
-    private void echo(String input) {
-        System.out.println(SEPARATOR);
-        System.out.println(input);
-        System.out.println(SEPARATOR);
+    /**
+     * Instantiates {@link Echo} chatbot instance with custom
+     * file path.
+     */
+    public Echo(Path fileSavePath) {
+        this.storage = new Storage(fileSavePath);
     }
 
     private void add(Task t) throws EchoException {
         tasks.add(t);
         storage.save(tasks);
-        echo("Got it. I've added this task:\n" + t.toString()
+        ui.echo("Got it. I've added this task:\n" + t.toString()
                 + "\nNow you have " + tasks.size() + " tasks in the list.");
     }
 
@@ -44,7 +36,7 @@ public class Echo {
         }
         Task t = tasks.remove(index);
         storage.save(tasks);
-        echo("Noted. I've removed this task:\n" + t.toString() +
+        ui.echo("Noted. I've removed this task:\n" + t.toString() +
                 "\nNow you have " + tasks.size() + " tasks in the list.");
     }
 
@@ -55,155 +47,77 @@ public class Echo {
             listTxt.append(i).append(".").append(task.toString());
             if (i != tasks.size()) listTxt.append("\n");
         }
-        echo(listTxt.toString());
+        ui.echo(listTxt.toString());
     }
 
     /**
      * Method with Codex contribution:
      * Marks the task at the given one-based task number as complete.
      *
-     * @param taskNumberText text supplied after the {@code mark} command
+     * @param taskIndex zero-based index of the task to mark
      */
-    private void mark(String taskNumberText) throws EchoException {
-        Task task = tasks.get(resolveTaskIndex(CommandType.MARK, taskNumberText));
+    private void mark(int taskIndex) throws EchoException {
+        Task task = getTask(taskIndex);
         task.markDone();
         storage.save(tasks);
-        echo("Nice! I've marked this task as done:\n" + task.toString());
+        ui.echo("Nice! I've marked this task as done:\n" + task.toString());
     }
 
     /**
      * Method with Codex contribution:
      * Marks the task at the given one-based task number as not done.
      *
-     * @param taskNumberText text supplied after the {@code unmark} command
+     * @param taskIndex zero-based index of the task to unmark
      */
-    private void unmark(String taskNumberText) throws EchoException {
-        Task task = tasks.get(resolveTaskIndex(CommandType.UNMARK, taskNumberText));
+    private void unmark(int taskIndex) throws EchoException {
+        Task task = getTask(taskIndex);
         task.markUnDone();
         storage.save(tasks);
-        echo("OK, I've marked this task as not done yet:\n" + task.toString());
+        ui.echo("OK, I've marked this task as not done yet:\n" + task.toString());
     }
-
     /**
-     * Parses the text following a mark or unmark command into the zero-based
-     * index of an existing task.
+     * Returns the task at the parsed index after checking it against the
+     * current task list. Parser cannot do this check because it does not own
+     * the list.
      *
-     * @param command command, used in error messages
-     * @param taskNumberStr text supplied after the command
-     * @return zero-based list index of the referenced task
-     * @throws EchoException when the number is missing, malformed, or out of range
+     * @param taskIndex zero-based task index from a command
+     * @return referenced task
+     * @throws InvalidTaskNumberException when the index is not in the list
      */
-    private int resolveTaskIndex(CommandType command, String taskNumberStr) throws EchoException {
-        if (taskNumberStr.isEmpty()) {
-            throw new TaskNumberFormatException(command);
-        }
-        try {
-            int taskNumber = Integer.parseInt(taskNumberStr);
-            if (taskNumber < 1 || taskNumber > tasks.size()) {
-                throw new InvalidTaskNumberException();
-            }
-            return taskNumber - 1;
-        } catch (NumberFormatException e) {
+    private Task getTask(int taskIndex) throws InvalidTaskNumberException {
+        if (taskIndex < 0 || taskIndex >= tasks.size()) {
             throw new InvalidTaskNumberException();
         }
-    }
-
-    private void showError(EchoException e) {
-        echo(e.getMessage());
+        return tasks.get(taskIndex);
     }
 
     /**
-     * Rejects task details containing the pipe character, which is reserved
-     * as the field separator in the save file; a saved task containing it
-     * could not be loaded again.
-     *
-     * @param detail one user-supplied task field
-     * @throws EchoException when the detail contains a pipe character
+     * Executes a parsed command against Echo's task list.
+     * @param command command to execute
      */
-    private void requireSavable(String detail) throws EchoException {
-        if (detail.contains("|")) {
-            throw new EchoException("'|' cannot be used because it separates fields in the save file.");
+    private boolean execute(Command command) throws EchoException {
+        switch (command.getType()) {
+        case BYE:
+            return true;
+        case LIST:
+            list();
+            break;
+        case TODO, DEADLINE, EVENT:
+            add(command.getTask());
+            break;
+        case MARK:
+            mark(command.getTaskIndex());
+            break;
+        case UNMARK:
+            unmark(command.getTaskIndex());
+            break;
+        case DELETE:
+            delete(command.getTaskIndex());
+            break;
         }
+        return false;
     }
 
-    /**
-     * Method with Codex contribution:
-     * Processes one input line, returning whether the user requested the chatbot to exit.
-     *
-     * @param input command line entered by the user
-     * @return true when Echo should stop accepting commands
-     * @throws EchoException if the command or its arguments are invalid
-     */
-    private boolean processCommand(String input) throws EchoException {
-        String trimmedInput = input.trim();
-        CommandType cmd = CommandType.fromInput(trimmedInput);
-        String args = trimmedInput.substring(cmd.getKeyword().length()).trim();
-        switch (cmd) {
-            case BYE:
-                return true;
-            case LIST:
-                list();
-                return false;
-            case MARK:
-                mark(args);
-                return false;
-            case UNMARK:
-                unmark(args);
-                return false;
-            case TODO:
-                if (args.isEmpty()) { throw new TodoFormatException(); }
-                requireSavable(args);
-                add(new Todo(args));
-                return false;
-            case DEADLINE:
-                String[] deadlineParts = args.split(" /by ", 2);
-                if  (deadlineParts.length != 2) { throw new DeadlineFormatException(); }
-                String deadlineDesc = deadlineParts[0].trim();
-                String dueDateTime = deadlineParts[1].trim();
-                if (deadlineDesc.isEmpty() || dueDateTime.isEmpty()) {
-                    throw new DeadlineFormatException();
-                }
-                requireSavable(deadlineDesc);
-                requireSavable(dueDateTime);
-                try {
-                    LocalDateTime by = LocalDateTime.parse(dueDateTime, DateTimeUtility.INPUT);
-                    add(new Deadline(deadlineDesc, by));
-                    return false;
-                } catch (DateTimeParseException e) {
-                    throw new DeadlineFormatException();
-                }
-            case EVENT:
-                String[] eventParts = args.split(" /from | /to ", 3);
-                if  (eventParts.length != 3) { throw new EventFormatException(); }
-                String eventDesc = eventParts[0].trim();
-                String startDateTime = eventParts[1].trim();
-                String endDateTime = eventParts[2].trim();
-                if (eventDesc.isEmpty() || startDateTime.isEmpty() || endDateTime.isEmpty()) {
-                    throw new EventFormatException();
-                }
-                requireSavable(eventDesc);
-                requireSavable(startDateTime);
-                requireSavable(endDateTime);
-                try {
-                    LocalDateTime from = LocalDateTime.parse(startDateTime, DateTimeUtility.INPUT);
-                    LocalDateTime to = LocalDateTime.parse(endDateTime, DateTimeUtility.INPUT);
-                    add(new Event(eventDesc, from, to));
-                    return false;
-                } catch (DateTimeParseException e) {
-                    throw new EventFormatException();
-                }
-            case DELETE:
-                try {
-                    if (args.isEmpty()) { throw new DeleteFormatException(); }
-                    delete(Integer.parseInt(args) - 1);
-                    return false;
-                } catch (NumberFormatException e) {
-                    throw new DeleteFormatException();
-                }
-            default:
-                throw new UnknownCommandException();
-        }
-    }
 
     /**
      * Runs the chatbot: loads any previously saved tasks, greets the user,
@@ -215,20 +129,20 @@ public class Echo {
         try {
             tasks.addAll(storage.read());
         } catch (StorageException e) {
-            showError(e);
+            ui.showError(e);
         }
-        greet();
+        ui.greet();
         while (scanner.hasNextLine()) {
             String input = scanner.nextLine();
             try {
-                if (processCommand(input)) {
+                if (execute(parser.parse(input))) {
                     break;
                 }
             } catch (EchoException exception) {
-                showError(exception);
+                ui.showError(exception);
             }
         }
-        farewell();
+        ui.farewell();
         scanner.close();
     }
 
