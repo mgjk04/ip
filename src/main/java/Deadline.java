@@ -1,14 +1,16 @@
-public class Deadline extends Task {
-    private String by = "?";
+import java.time.LocalDateTime;
 
-    public Deadline(String description, String by) {
+public class Deadline extends Task {
+    private final LocalDateTime by;
+
+    public Deadline(String description, LocalDateTime by) {
         super(description);
         this.by = by;
     }
 
     @Override
     public String toString() {
-        return "[D]" + super.toString() + " (by: " + by + ")";
+        return "[D]" + super.toString() + " (by: " + by.format(DateTimeUtility.DISPLAY) + ")";
     }
 
     @Override
@@ -27,7 +29,7 @@ public class Deadline extends Task {
         if (fields.length != 4 || fields[3].isEmpty()) {
             throw new IllegalArgumentException("A saved deadline must have exactly 4 non-empty fields.");
         }
-        return new Deadline(fields[2], fields[3]);
+        return new Deadline(fields[2], LocalDateTime.parse(fields[3]));
     }
 }
 
