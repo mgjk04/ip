@@ -1,6 +1,13 @@
 package echo.exception;
 
+/**
+ * An exception class for all Exceptions unique to Echo.
+ */
 public class EchoException extends Exception {
+    /**
+     * Creates an {@link EchoException}.
+     * @param message detail of what went wrong, shown to the user
+     */
     public EchoException(String message) {
         super("OOPS!!! " + message);
     }

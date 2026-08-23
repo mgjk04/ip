@@ -4,22 +4,39 @@ import echo.utils.DateTimeUtility;
 
 import java.time.LocalDateTime;
 
+/**
+ * A {@link Task} with a start and end {@link LocalDateTime}.
+ */
 public class Event extends Task {
     private final LocalDateTime from;
     private final LocalDateTime to;
 
+    /**
+     * Creates an incomplete event task.
+     * @param description description of event.
+     * @param from the {@link LocalDateTime} the event starts.
+     * @param to the {@link LocalDateTime} the event ends.
+     */
     public Event(String description, LocalDateTime from, LocalDateTime to) {
         super(description);
         this.from = from;
         this.to = to;
     }
 
+    /**
+     * Creates {@link String} representation of the {@link Event} instance
+     * @return String representation of event
+     */
     @Override
     public String toString() {
         return "[E]" + super.toString() + " (from: " + this.from.format(DateTimeUtility.DISPLAY)
                 + " to: " + this.to.format(DateTimeUtility.DISPLAY) + ")";
     }
 
+    /**
+     * Creates save {@link String} representation of the {@link Event} instance
+     * @return Save string representation of event
+     */
     @Override
     public String toSaveFormat() {
         return "E | " + super.toSaveFormat() + " | " + this.from + " | " + this.to;

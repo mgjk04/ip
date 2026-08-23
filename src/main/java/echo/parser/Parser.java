@@ -44,6 +44,14 @@ public class Parser {
         };
     }
 
+    /**
+     * Parses the string arguments according to what is expected
+     * of the todo command and returns a Command.
+     * Throws EchoException otherwise.
+     * @param arguments string arguments of the command
+     * @return a {@link Command} that can be executed
+     * @throws EchoException if the arguments do not adhere to the todo format
+     */
     private Command parseTodo(String arguments) throws EchoException {
         if (arguments.isEmpty()) {
             throw new TodoFormatException();
@@ -52,6 +60,14 @@ public class Parser {
         return new AddCommand(new Todo(arguments));
     }
 
+    /**
+     * Parses the string arguments according to what is expected
+     * of the deadline command and returns a {@link Command}.
+     * Throws EchoException otherwise.
+     * @param arguments string arguments of the command
+     * @return a {@link Command} that can be executed
+     * @throws EchoException if the arguments do not adhere to the deadline format
+     */
     private Command parseDeadline(String arguments) throws EchoException {
         String[] parts = arguments.split(" /by ", 2);
         if (parts.length != 2) {
@@ -73,7 +89,14 @@ public class Parser {
             throw new DeadlineFormatException();
         }
     }
-
+    /**
+     * Parses the string arguments according to what is expected
+     * of the event command and returns a {@link Command}.
+     * Throws EchoException otherwise.
+     * @param arguments string arguments of the command
+     * @return a {@link Command} that can be executed
+     * @throws EchoException if the arguments do not adhere to the event format
+     */
     private Command parseEvent(String arguments) throws EchoException {
         String[] descriptionAndSchedule = arguments.split(" /from ", 2);
         if (descriptionAndSchedule.length != 2) {

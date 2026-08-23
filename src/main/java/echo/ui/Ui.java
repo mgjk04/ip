@@ -2,6 +2,9 @@ package echo.ui;
 
 import echo.exception.EchoException;
 
+/**
+ * A class that handles all the UI of Echo via print statements.
+ */
 public class Ui {
     private final String NAME;
     private final String SEPARATOR;

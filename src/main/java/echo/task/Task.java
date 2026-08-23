@@ -6,8 +6,8 @@ import echo.exception.StorageException;
 import java.time.format.DateTimeParseException;
 
 /**
- * File with Codex contribution:
  * Represents a task description and whether the task has been completed.
+ * Class with Codex contribution.
  */
 public class Task {
     private final String description;
@@ -73,6 +73,11 @@ public class Task {
         }
     }
 
+    /**
+     * Creates String representation of a task.
+     * Contains the doneness and description only.
+     * @return String representation of a Task
+     */
     @Override
     public String toString() {
         return "[" + (this.isDone ? "X" : " ") + "] " + description;
