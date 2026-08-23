@@ -28,9 +28,13 @@ Unless the user says otherwise, assume that you are assisting a student working 
 
 Ensure that Java 25 is used when running the application or build tasks. On macOS, use `sdk use java 25.0.3.fx-zulu` to switch to Java 25 if needed.
 
+## Unit testing
+
+JUnit tests focus on the top ~50% highest-value methods in the codebase, prioritising complex, core, or critical business logic over trivial accessors, I/O glue, and exception holder classes. Follow Gradle and JUnit conventions: mirror the package structure under `src/test/java` and name each test class `FooTest` for the class `Foo` being tested. After every code change, review the affected classes and update or extend the JUnit test suite so it stays compliant with this coverage target, then run `./gradlew test` to verify that all tests pass. If a unit test fails, stop and report the actual and expected output before making further code changes.
+
 ## UI testing
 
-After every code update, review `test/ui-test-plan.md` and update its test cases whenever the user-visible console behaviour has changed or requires additional coverage. Then invoke the `$test-ui` skill to run the plan. If a UI test fails, stop and report the actual and expected output before making further code changes.
+After every code update, review `src/test/ui-test-plan.md` and update its test cases whenever the user-visible console behaviour has changed or requires additional coverage. Then invoke the `$test-ui` skill to run the plan. If a UI test fails, stop and report the actual and expected output before making further code changes.
 
 ## Git
 

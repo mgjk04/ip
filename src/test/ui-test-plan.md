@@ -18,9 +18,9 @@ D | 0 | return book | 2019-12-02T18:00
 E | 0 | project meeting | 2019-12-02T14:00 | 2019-12-02T16:00
 ```
 
-On startup Echo reads `data/echo.txt` (if present) and restores those tasks before greeting; a missing file starts an empty list, and a malformed line reports a storage error instead of aborting (see the last two cases). Task details must not contain `|` because it separates saved fields; inputs that do are rejected outright (see the "pipe characters are rejected" case). To verify persistence manually from a known state:
+On startup Echo reads `../../data/echo.txt` (if present) and restores those tasks before greeting; a missing file starts an empty list, and a malformed line reports a storage error instead of aborting (see the last two cases). Task details must not contain `|` because it separates saved fields; inputs that do are rejected outright (see the "pipe characters are rejected" case). To verify persistence manually from a known state:
 
-1. Delete `data/echo.txt`, run one session that adds `todo borrow book`, then quit with `bye`.
+1. Delete `../../data/echo.txt`, run one session that adds `todo borrow book`, then quit with `bye`.
 2. Start a new session entering `list`: `[T][ ] borrow book` must appear.
 3. Re-running the same session after `mark 1` must show `[T][X] borrow book`.
 
