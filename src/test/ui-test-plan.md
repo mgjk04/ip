@@ -344,6 +344,70 @@ Bye!
 ============================================================
 ```
 
+## Test case: find filters tasks by description keyword
+
+- **Aim:** Verify that `find` lists only tasks whose description contains the keyword while keeping their full-list numbers usable for mark/unmark/delete, that matching is case-sensitive, and that a missing keyword reports a format error.
+- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes/java/main echo.Echo`
+- **Inputs:**
+```text
+todo read book
+deadline return book /by 2019-06-06 1800
+event project meeting /from 2019-08-06 1400 /to 2019-08-06 1600
+todo borrow newspaper
+find book
+find BOOK
+find
+bye
+```
+- **Expected output:**
+```text
+============================================================
+ _____     _           
+| ____|___| |__   ___  
+|  _| / __| '_ \ / _ \ 
+| |__| (__| | | | (_) |
+|_____\___|_| |_|\___/ 
+
+Hello! I'm Echo.
+How can I help?
+============================================================
+============================================================
+Got it. I've added this task:
+[T][ ] read book
+Now you have 1 tasks in the list.
+============================================================
+============================================================
+Got it. I've added this task:
+[D][ ] return book (by: Jun 06 2019, 6:00 PM)
+Now you have 2 tasks in the list.
+============================================================
+============================================================
+Got it. I've added this task:
+[E][ ] project meeting (from: Aug 06 2019, 2:00 PM to: Aug 06 2019, 4:00 PM)
+Now you have 3 tasks in the list.
+============================================================
+============================================================
+Got it. I've added this task:
+[T][ ] borrow newspaper
+Now you have 4 tasks in the list.
+============================================================
+============================================================
+Here are the matching tasks in your list:
+1.[T][ ] read book
+2.[D][ ] return book (by: Jun 06 2019, 6:00 PM)
+============================================================
+============================================================
+Here are the matching tasks in your list:
+
+============================================================
+============================================================
+OOPS!!! Invalid find command. Format: find <keyword>
+============================================================
+============================================================
+Bye!
+============================================================
+```
+
 ## Test case: missing task numbers report format errors
 
 - **Aim:** Verify that mark, unmark, and delete without a task number each report their command-specific format error instead of the generic invalid-number message.

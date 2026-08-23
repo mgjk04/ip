@@ -23,6 +23,14 @@ public class Task {
         this.isDone = false;
     }
 
+    /**
+     * Gets description of the task.
+     * @return description string of the task.
+     */
+    public String getDescription() {
+        return description;
+    }
+
     /** Marks this task as complete. */
     public void markDone() {
         isDone = true;

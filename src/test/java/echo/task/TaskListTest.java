@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
@@ -175,5 +176,38 @@ public class TaskListTest {
 
         assertEquals("Here are the tasks in your list:\n1.[X] finished",
                 tasks.asListText());
+    }
+
+    @Test
+    public void searchListText_multipleMatches_showsFullListNumbersBetweenLines() {
+        // Numbers refer to positions in the full list (not renumbered) so
+        // they stay valid for mark/unmark/delete.
+        TaskList tasks = new TaskList();
+        tasks.add(new TaskStub("read book"));
+        tasks.add(new TaskStub("water plants"));
+        tasks.add(new TaskStub("return book"));
+
+        String expected = "Here are the matching tasks in your list:\n"
+                + "1.[ ] read book\n"
+                + "3.[ ] return book";
+        assertEquals(expected, tasks.searchListText("book"));
+    }
+
+    @Test
+    public void searchListText_noMatch_returnsHeaderOnly() {
+        TaskList tasks = new TaskList();
+        tasks.add(new TaskStub("read book"));
+
+        assertEquals("Here are the matching tasks in your list:\n",
+                tasks.searchListText("zebra"));
+    }
+
+    @Test
+    public void searchListText_nonMatchingLastTask_hasNoTrailingNewline() {
+        TaskList tasks = new TaskList();
+        tasks.add(new TaskStub("read book"));
+        tasks.add(new TaskStub("water plants"));
+
+        assertFalse(tasks.searchListText("book").endsWith("\n"));
     }
 }

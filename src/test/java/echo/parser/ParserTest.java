@@ -3,12 +3,14 @@ package echo.parser;
 import echo.command.AddCommand;
 import echo.command.DeleteCommand;
 import echo.command.ExitCommand;
+import echo.command.FindCommand;
 import echo.command.ListCommand;
 import echo.command.MarkCommand;
 import echo.exception.DeadlineFormatException;
 import echo.exception.DeleteFormatException;
 import echo.exception.EchoException;
 import echo.exception.EventFormatException;
+import echo.exception.FindFormatException;
 import echo.exception.InvalidTaskNumberException;
 import echo.exception.TaskNumberFormatException;
 import echo.exception.TodoFormatException;
@@ -55,6 +57,21 @@ public class ParserTest {
     public void parse_unknownKeyword_exceptionThrown() {
         assertThrows(UnknownCommandException.class,
                 () -> new Parser().parse("frobnicate"));
+    }
+
+    @Test
+    public void parse_findWithKeyword_returnsFindCommand() throws EchoException {
+        assertTrue(new Parser().parse("find book") instanceof FindCommand);
+    }
+
+    @Test
+    public void parse_findWithoutKeyword_exceptionThrown() {
+        assertThrows(FindFormatException.class, () -> new Parser().parse("find"));
+    }
+
+    @Test
+    public void parse_findWhitespaceOnlyKeyword_exceptionThrown() {
+        assertThrows(FindFormatException.class, () -> new Parser().parse("find   "));
     }
 
     @Test

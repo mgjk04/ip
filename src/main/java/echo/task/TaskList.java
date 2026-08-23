@@ -103,4 +103,30 @@ public class TaskList {
         }
         return listTxt.toString();
     }
+
+    /**
+     * Formats every task whose description contains the searchText as a
+     * numbered list, e.g. for the {@code find} command output. Matches keep
+     * their full-list numbers so they can still be used with commands such
+     * as {@code mark} and {@code delete}.
+     *
+     * @param searchText text to search for in task descriptions
+     * @return multi-line text of matching tasks prefixed with their one-based
+     *         full-list numbers; header only when nothing matches
+     */
+    public String searchListText(String searchText) {
+        StringBuilder listTxt = new StringBuilder("Here are the matching tasks in your list:\n");
+        boolean isFirstMatch = true;
+        for (int i = 1; i <= tasks.size(); ++i) {
+            if (!tasks.get(i - 1).getDescription().contains(searchText)) {
+                continue;
+            }
+            if (!isFirstMatch) {
+                listTxt.append("\n");
+            }
+            isFirstMatch = false;
+            listTxt.append(i).append(".").append(tasks.get(i - 1).toString());
+        }
+        return listTxt.toString();
+    }
 }

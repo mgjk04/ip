@@ -6,14 +6,16 @@ import echo.command.DeleteCommand;
 import echo.command.ExitCommand;
 import echo.command.ListCommand;
 import echo.command.MarkCommand;
-import echo.exception.DeadlineFormatException;
+import echo.command.FindCommand;
 import echo.exception.DeleteFormatException;
 import echo.exception.EchoException;
-import echo.exception.EventFormatException;
+import echo.exception.FindFormatException;
 import echo.exception.InvalidTaskNumberException;
 import echo.exception.TaskNumberFormatException;
-import echo.exception.TodoFormatException;
 import echo.exception.UnknownCommandException;
+import echo.exception.TodoFormatException;
+import echo.exception.DeadlineFormatException;
+import echo.exception.EventFormatException;
 import echo.task.Deadline;
 import echo.task.Event;
 import echo.task.Todo;
@@ -52,17 +54,18 @@ public class Parser {
                 new TaskNumberFormatException("unmark"), new InvalidTaskNumberException()), false);
         case "delete" -> new DeleteCommand(parseIndex(arguments,
                 new DeleteFormatException(), new DeleteFormatException()));
+        case "find" -> parseFind(arguments);
         default -> throw new UnknownCommandException();
         };
     }
 
     /**
      * Parses the string arguments according to what is expected
-     * of the todo command and returns a Command.
+     * of the {@code todo} command and returns a Command.
      * Throws EchoException otherwise.
      * @param arguments string arguments of the command
      * @return a {@link Command} that can be executed
-     * @throws EchoException if the arguments do not adhere to the todo format
+     * @throws EchoException if the arguments do not adhere to the {@code todo} format
      */
     private Command parseTodo(String arguments) throws EchoException {
         if (arguments.isEmpty()) {
@@ -80,6 +83,13 @@ public class Parser {
      * @return a {@link Command} that can be executed
      * @throws EchoException if the arguments do not adhere to the deadline format
      */
+    private Command parseFind(String arguments) throws EchoException {
+        if (arguments.isEmpty()) {
+            throw new FindFormatException();
+        }
+        return new FindCommand(arguments);
+    }
+
     private Command parseDeadline(String arguments) throws EchoException {
         String[] parts = arguments.split(" /by ", 2);
         if (parts.length != 2) {
