@@ -6,7 +6,6 @@ import echo.exception.StorageException;
 import java.time.format.DateTimeParseException;
 
 /**
- * File with Codex contribution:
  * Represents a task description and whether the task has been completed.
  */
 public class Task {
@@ -66,7 +65,9 @@ public class Task {
                 case "E" -> Event.fromSaveFormat(fields);
                 default -> throw new CorruptFormatException(saveFormat);
             };
-            if (fields[1].equals("1")) { task.markDone(); }
+            if (fields[1].equals("1")) {
+                task.markDone();
+            }
             return task;
         } catch (IllegalArgumentException | DateTimeParseException e) {
             throw new CorruptFormatException(saveFormat);

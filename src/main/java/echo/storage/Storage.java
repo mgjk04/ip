@@ -17,14 +17,14 @@ import java.util.Scanner;
  * {@code D | 1 | return book | Sunday}.
  */
 public class Storage {
-    private final Path SAVE_FILE;
+    private final Path saveFile;
 
     /**
      * Instantiates the {@link Storage} class with default
      * save file path.
      */
     public Storage() {
-        this.SAVE_FILE = Path.of("data", "echo.txt");
+        this.saveFile = Path.of("data", "echo.txt");
     }
 
     /**
@@ -33,8 +33,9 @@ public class Storage {
      * @param fileSavePath {@link Path} of save file
      */
     public Storage(Path fileSavePath) {
-        this.SAVE_FILE = fileSavePath;
+        this.saveFile = fileSavePath;
     }
+
     /**
      * Overwrites the save file with one line per task, creating the
      * {@code data} directory first if it does not exist yet.
@@ -48,10 +49,10 @@ public class Storage {
             lines.add(t.toSaveFormat());
         }
         try {
-            Files.createDirectories(SAVE_FILE.getParent());
-            Files.write(SAVE_FILE, lines);
+            Files.createDirectories(saveFile.getParent());
+            Files.write(saveFile, lines);
         } catch (IOException e) {
-            throw new StorageException("I could not save your tasks to " + SAVE_FILE + ".");
+            throw new StorageException("I could not save your tasks to " + saveFile + ".");
         }
     }
 
@@ -66,10 +67,10 @@ public class Storage {
      */
     public ArrayList<Task> read() throws StorageException {
         ArrayList<Task> tasks = new ArrayList<>();
-        if (!Files.exists(SAVE_FILE)) {
+        if (!Files.exists(saveFile)) {
             return tasks;
         }
-        try (Scanner scanner = new Scanner(SAVE_FILE)) {
+        try (Scanner scanner = new Scanner(saveFile)) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine().trim();
                 if (!line.isEmpty()) {
@@ -78,7 +79,7 @@ public class Storage {
             }
             return tasks;
         } catch (IOException e) {
-            throw new StorageException("I could not read your tasks at " + SAVE_FILE + ".");
+            throw new StorageException("I could not read your tasks at " + saveFile + ".");
         }
     }
 }

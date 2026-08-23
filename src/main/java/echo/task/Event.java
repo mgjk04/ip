@@ -4,10 +4,20 @@ import echo.utils.DateTimeUtility;
 
 import java.time.LocalDateTime;
 
+/**
+ * Represents a task that starts and ends at specific date-times.
+ */
 public class Event extends Task {
     private final LocalDateTime from;
     private final LocalDateTime to;
 
+    /**
+     * Creates an incomplete event with the given description and schedule.
+     *
+     * @param description text that describes the event
+     * @param from date-time at which the event starts
+     * @param to date-time at which the event ends
+     */
     public Event(String description, LocalDateTime from, LocalDateTime to) {
         super(description);
         this.from = from;

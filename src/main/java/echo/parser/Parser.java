@@ -1,7 +1,19 @@
 package echo.parser;
 
-import echo.command.*;
-import echo.exception.*;
+import echo.command.AddCommand;
+import echo.command.Command;
+import echo.command.DeleteCommand;
+import echo.command.ExitCommand;
+import echo.command.ListCommand;
+import echo.command.MarkCommand;
+import echo.exception.DeadlineFormatException;
+import echo.exception.DeleteFormatException;
+import echo.exception.EchoException;
+import echo.exception.EventFormatException;
+import echo.exception.InvalidTaskNumberException;
+import echo.exception.TaskNumberFormatException;
+import echo.exception.TodoFormatException;
+import echo.exception.UnknownCommandException;
 import echo.task.Deadline;
 import echo.task.Event;
 import echo.task.Todo;

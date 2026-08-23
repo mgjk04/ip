@@ -8,7 +8,10 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-// class with Opencode contribution
+/**
+ * Tests {@link TaskList} operations: adding, retrieving, deleting, and
+ * listing tasks, including out-of-bounds handling.
+ */
 public class TaskListTest {
 
     /**

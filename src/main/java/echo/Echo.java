@@ -11,11 +11,16 @@ import echo.ui.Ui;
 import java.nio.file.Path;
 import java.util.Scanner;
 
+/**
+ * Entry point of the Echo chatbot application. Wires together the task list,
+ * UI, parser, and storage components, then runs the read-evaluate-print loop.
+ */
 public class Echo {
     private final TaskList taskList = new TaskList();
     private final Ui ui = new Ui();
     private final Storage storage;
     private final Parser parser = new Parser();
+
     /**
      * Instantiates {@link Echo} chatbot instance with default
      * parameters.
@@ -60,6 +65,11 @@ public class Echo {
         scanner.close();
     }
 
+    /**
+     * Starts a chatbot with the default save file path.
+     *
+     * @param args command-line arguments (unused)
+     */
     public static void main(String[] args) {
         new Echo().run();
     }

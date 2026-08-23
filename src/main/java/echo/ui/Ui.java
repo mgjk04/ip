@@ -2,18 +2,21 @@ package echo.ui;
 
 import echo.exception.EchoException;
 
+/**
+ * Handles all interaction with the user: greeting, echoing command feedback,
+ * and showing error messages, each framed by a separator line.
+ */
 public class Ui {
-    private final String NAME;
-    private final String SEPARATOR;
+    private final String name;
+    private final String separator;
 
     /**
      * Instantiates {@link Ui} class with default parameters.
      */
     public Ui() {
-        this.NAME = "Echo";
-        this.SEPARATOR = "============================================================";
+        this.name = "Echo";
+        this.separator = "============================================================";
     }
-
 
     /**
      * Instantiates {@link Ui} class with custom parameters.
@@ -21,8 +24,8 @@ public class Ui {
      * @param separator separator between messages
      */
     public Ui(String name, String separator) {
-        this.NAME = name;
-        this.SEPARATOR = separator;
+        this.name = name;
+        this.separator = separator;
     }
 
     /**
@@ -34,7 +37,7 @@ public class Ui {
                 + "|  _| / __| '_ \\ / _ \\ \n"
                 + "| |__| (__| | | | (_) |\n"
                 + "|_____\\___|_| |_|\\___/ \n";
-        String salutation = "Hello! I'm " + NAME + ".\n" +
+        String salutation = "Hello! I'm " + name + ".\n" +
                 "How can I help?";
         echo(banner + "\n" + salutation);
     }
@@ -53,9 +56,9 @@ public class Ui {
      * @param input input message to be wrapped by the separator.
      */
     public void echo(String input) {
-        System.out.println(SEPARATOR);
+        System.out.println(separator);
         System.out.println(input);
-        System.out.println(SEPARATOR);
+        System.out.println(separator);
     }
 
     /**

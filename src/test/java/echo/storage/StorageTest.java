@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-// Class with Opencode contribution
+
 /**
  * Tests {@link Storage} save/read round-trips using a temporary directory
  * so the real {@code data/echo.txt} is never touched.

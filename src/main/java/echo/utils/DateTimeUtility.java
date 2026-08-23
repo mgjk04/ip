@@ -10,11 +10,11 @@ import java.util.Locale;
  * a friendlier style (e.g., {@code Dec 02 2019, 6:00 PM}).
  */
 public class DateTimeUtility {
-    // Accepts user-supplied dates, e.g. {@code 2019-12-02 1800}.
+    /** Accepts user-supplied dates, e.g. {@code 2019-12-02 1800}. */
     public static final DateTimeFormatter INPUT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
 
-    // Renders dates for display, e.g. {@code Dec 02 2019, 6:00 PM}.
+    /** Renders dates for display, e.g. {@code Dec 02 2019, 6:00 PM}. */
     public static final DateTimeFormatter DISPLAY = DateTimeFormatter
             .ofPattern("MMM dd yyyy, h:mm a")
             .withLocale(Locale.ENGLISH);
