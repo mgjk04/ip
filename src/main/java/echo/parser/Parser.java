@@ -1,7 +1,15 @@
 package echo.parser;
 
 import echo.command.*;
-import echo.exception.*;
+import echo.exception.DeleteFormatException;
+import echo.exception.EchoException;
+import echo.exception.FindFormatException;
+import echo.exception.InvalidTaskNumberException;
+import echo.exception.TaskNumberFormatException;
+import echo.exception.UnknownCommandException;
+import echo.exception.TodoFormatException;
+import echo.exception.DeadlineFormatException;
+import echo.exception.EventFormatException;
 import echo.task.Deadline;
 import echo.task.Event;
 import echo.task.Todo;
@@ -40,6 +48,7 @@ public class Parser {
                 new TaskNumberFormatException("unmark"), new InvalidTaskNumberException()), false);
         case "delete" -> new DeleteCommand(parseIndex(arguments,
                 new DeleteFormatException(), new DeleteFormatException()));
+        case "find" -> parseFind(arguments);
         default -> throw new UnknownCommandException();
         };
     }
@@ -50,6 +59,21 @@ public class Parser {
         }
         requireSavable(arguments);
         return new AddCommand(new Todo(arguments));
+    }
+
+    /**
+     * Builds a find command after checking a keyword was supplied. An empty
+     * keyword is rejected because it would otherwise match every task.
+     *
+     * @param arguments text following the {@code find} keyword
+     * @return find command carrying the search text
+     * @throws FindFormatException when no keyword is given
+     */
+    private Command parseFind(String arguments) throws EchoException {
+        if (arguments.isEmpty()) {
+            throw new FindFormatException();
+        }
+        return new FindCommand(arguments);
     }
 
     private Command parseDeadline(String arguments) throws EchoException {

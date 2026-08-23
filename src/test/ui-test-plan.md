@@ -28,7 +28,7 @@ Successful saves and loads produce no console output, so the expected transcript
 ## Test case: greeting and graceful exit
 
 - **Aim:** Verify that Echo presents its greeting and exits cleanly when the user enters `bye`.
-- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes echo.Echo`
+- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes/java/main echo.Echo`
 - **Inputs:**
 ```text
 bye
@@ -53,7 +53,7 @@ Bye!
 ## Test case: add and list all task types
 
 - **Aim:** Verify that ToDos, Deadlines, and Events are stored polymorphically, accept `yyyy-MM-dd HHmm` dates, and display them reformatted.
-- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes echo.Echo`
+- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes/java/main echo.Echo`
 - **Inputs:**
 ```text
 todo borrow book
@@ -103,7 +103,7 @@ Bye!
 ## Test case: invalid commands show helpful errors
 
 - **Aim:** Verify that Echo catches invalid commands and malformed task inputs without terminating the session.
-- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes echo.Echo`
+- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes/java/main echo.Echo`
 - **Inputs:**
 ```text
 todo
@@ -152,7 +152,7 @@ Bye!
 ## Test case: errors do not change existing tasks
 
 - **Aim:** Verify that rejected commands, including dates in an invalid format such as month 13, leave the task list unchanged while valid commands before and after them still work.
-- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes echo.Echo`
+- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes/java/main echo.Echo`
 - **Inputs:**
 ```text
 todo
@@ -225,7 +225,7 @@ Bye!
 ## Test case: malformed task fields do not consume task numbers
 
 - **Aim:** Verify that unparseable or incomplete deadline and event fields, plus a command with an unrecognised keyword, do not affect later valid tasks or their numbers.
-- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes echo.Echo`
+- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes/java/main echo.Echo`
 - **Inputs:**
 ```text
 deadline plan /by someday
@@ -285,7 +285,7 @@ Bye!
 ## Test case: delete a task and renumber the remaining list
 
 - **Aim:** Verify that `delete` removes the specified task, reports the new task count, and leaves the remaining tasks in their correct order with consecutive list numbers.
-- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes echo.Echo`
+- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes/java/main echo.Echo`
 - **Inputs:**
 ```text
 todo read book
@@ -344,10 +344,74 @@ Bye!
 ============================================================
 ```
 
+## Test case: find filters tasks by description keyword
+
+- **Aim:** Verify that `find` lists only tasks whose description contains the keyword while keeping their full-list numbers usable for mark/unmark/delete, that matching is case-sensitive, and that a missing keyword reports a format error.
+- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes/java/main echo.Echo`
+- **Inputs:**
+```text
+todo read book
+deadline return book /by 2019-06-06 1800
+event project meeting /from 2019-08-06 1400 /to 2019-08-06 1600
+todo borrow newspaper
+find book
+find BOOK
+find
+bye
+```
+- **Expected output:**
+```text
+============================================================
+ _____     _           
+| ____|___| |__   ___  
+|  _| / __| '_ \ / _ \ 
+| |__| (__| | | | (_) |
+|_____\___|_| |_|\___/ 
+
+Hello! I'm Echo.
+How can I help?
+============================================================
+============================================================
+Got it. I've added this task:
+[T][ ] read book
+Now you have 1 tasks in the list.
+============================================================
+============================================================
+Got it. I've added this task:
+[D][ ] return book (by: Jun 06 2019, 6:00 PM)
+Now you have 2 tasks in the list.
+============================================================
+============================================================
+Got it. I've added this task:
+[E][ ] project meeting (from: Aug 06 2019, 2:00 PM to: Aug 06 2019, 4:00 PM)
+Now you have 3 tasks in the list.
+============================================================
+============================================================
+Got it. I've added this task:
+[T][ ] borrow newspaper
+Now you have 4 tasks in the list.
+============================================================
+============================================================
+Here are the matching tasks in your list:
+1.[T][ ] read book
+2.[D][ ] return book (by: Jun 06 2019, 6:00 PM)
+============================================================
+============================================================
+Here are the matching tasks in your list:
+
+============================================================
+============================================================
+OOPS!!! Invalid find command. Format: find <keyword>
+============================================================
+============================================================
+Bye!
+============================================================
+```
+
 ## Test case: missing task numbers report format errors
 
 - **Aim:** Verify that mark, unmark, and delete without a task number each report their command-specific format error instead of the generic invalid-number message.
-- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes echo.Echo`
+- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes/java/main echo.Echo`
 - **Inputs:**
 ```text
 mark
@@ -384,7 +448,7 @@ Bye!
 ## Test case: pipe characters are rejected
 
 - **Aim:** Verify that task details containing the reserved save-file separator '|' are rejected for every task type and leave the list unchanged.
-- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes echo.Echo`
+- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes/java/main echo.Echo`
 - **Inputs:**
 ```text
 todo evil | plan
@@ -426,7 +490,7 @@ Bye!
 ## Test case: date values are validated and formatted
 
 - **Aim:** Verify that Level-8 date handling rejects unsupported formats (the slash style `2/12/2019 1800`, non-date words, and dates without a time) for both deadlines and events, keeps the list unchanged, and shows accepted dates in a friendlier format than they were entered.
-- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes echo.Echo`
+- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes/java/main echo.Echo`
 - **Inputs:**
 ```text
 deadline return book /by 2/12/2019 1800
@@ -472,7 +536,7 @@ Bye!
 ## Test case: corrupted save lines report storage errors on load
 
 - **Aim:** Verify that a saved line containing an unparsable date is reported at startup as a storage error instead of crashing, after which the session continues with the remaining valid tasks discarded.
-- **Command:** `(if exist data rmdir /s /q data) & mkdir data & (echo T ^| 0 ^| read book>data\echo.txt) & (echo D ^| 1 ^| return book ^| Sunday>>data\echo.txt) & java -cp build/classes echo.Echo`
+- **Command:** `(if exist data rmdir /s /q data) & mkdir data & (echo T ^| 0 ^| read book>data\echo.txt) & (echo D ^| 1 ^| return book ^| Sunday>>data\echo.txt) & java -cp build/classes/java/main echo.Echo`
 - **Inputs:**
 ```text
 list
