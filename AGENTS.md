@@ -46,6 +46,11 @@ After every code update, review `src/test/ui-test-plan.md` and update its test c
 
 ## Git
 
+All commit messages and branch names in this repository MUST follow the se-edu Git
+conventions. Invoke the `$seedu-git-standard` skill whenever proposing or creating a
+commit, naming a branch, or reviewing git history. The skill distills
+https://se-education.org/guides/conventions/git.html.
+
 Use lightweight tags unless the user requests an annotated tag.
 When proposing or creating a commit message, include enough detail to explain the rationale for the change.
 Do not commit or push unless explicitly asked.
