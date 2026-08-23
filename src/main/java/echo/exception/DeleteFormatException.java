@@ -1,10 +1,13 @@
 package echo.exception;
 
 /**
- * A {@link EchoException}
+ * A {@link EchoException} that signals that the delete command was entered without a task number or
+ * with an unusable one.
  */
 public class DeleteFormatException extends EchoException {
-    /** Creates the error shown when a delete command lacks a valid task number. */
+    /**
+     * Creates the error shown when a delete command lacks a valid task number.
+     * Shows the correct delete command format.*/
     public DeleteFormatException() {
         super("Invalid delete command. Format: delete <taskNumber>");
     }

@@ -5,8 +5,8 @@ package echo.exception;
  */
 public class StorageException extends EchoException {
     /**
-     * Creates a {@link StorageException}.
-     * @param message detail of what went wrong, shown to the user
+     * Creates a {@link StorageException} describing the storage problem.
+     * @param message explanation of what went wrong.
      */
     public StorageException(String message) {
         super("Storage exception occurred. " + message);

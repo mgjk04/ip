@@ -97,7 +97,9 @@ public class TaskList {
         StringBuilder listTxt = new StringBuilder("Here are the tasks in your list:\n");
         for (int i = 1; i <= tasks.size(); ++i) {
             listTxt.append(i).append(".").append(tasks.get(i - 1).toString());
-            if (i != tasks.size()) listTxt.append("\n");
+            if (i != tasks.size()) {
+                listTxt.append("\n");
+            }
         }
         return listTxt.toString();
     }

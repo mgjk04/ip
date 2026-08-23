@@ -5,7 +5,7 @@ package echo.exception;
  */
 public class EchoException extends Exception {
     /**
-     * Creates an {@link EchoException}.
+     * Creates an {@link EchoException} with the given message, prefixed for display.
      * @param message detail of what went wrong, shown to the user
      */
     public EchoException(String message) {

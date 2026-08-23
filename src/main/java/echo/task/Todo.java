@@ -1,12 +1,13 @@
 package echo.task;
 
 /**
- * A {@link Task} with only a description and the ability to mark/unmark as done.
+ * Represents a task without any date attached to it.
  */
 public class Todo extends Task {
     /**
-     * Creates an incomplete Todo.
-     * @param description Description of Todo.
+     * Creates an incomplete {@code todo} with the given description.
+     *
+     * @param description text that describes the {@code todo}
      */
     public Todo(String description) {
         super(description);
@@ -31,11 +32,11 @@ public class Todo extends Task {
     }
 
     /**
-     * Reconstructs a todo from its save-format fields (type letter,
+     * Reconstructs a {@code todo} from its save-format fields (type letter,
      * completion flag, description).
      *
-     * @param fields the split save-file line for this todo.
-     * @return the reconstructed todo.
+     * @param fields the split save-file line for this {@code todo}.
+     * @return the reconstructed {@code todo}.
      */
     public static Todo fromSaveFormat(String[] fields) {
         if (fields.length != 3) {

@@ -66,7 +66,9 @@ public class Task {
                 case "E" -> Event.fromSaveFormat(fields);
                 default -> throw new CorruptFormatException(saveFormat);
             };
-            if (fields[1].equals("1")) { task.markDone(); }
+            if (fields[1].equals("1")) {
+                task.markDone();
+            }
             return task;
         } catch (IllegalArgumentException | DateTimeParseException e) {
             throw new CorruptFormatException(saveFormat);
