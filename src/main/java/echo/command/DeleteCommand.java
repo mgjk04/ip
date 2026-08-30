@@ -30,7 +30,8 @@ public class DeleteCommand extends Command {
     public String execute(TaskList taskList, Ui ui, Storage storage) throws EchoException {
         Task removed = taskList.delete(index);
         storage.save(taskList.getAll());
-        return ui.echo("Noted. I've removed this task:\n" + removed.toString()
-                + "\nNow you have " + taskList.size() + " tasks in the list.");
+        return ui.echo("Noted. I've removed this task:",
+                removed.toString(),
+                "Now you have " + taskList.size() + " tasks in the list.");
     }
 }

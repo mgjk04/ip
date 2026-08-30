@@ -39,7 +39,7 @@ public class Ui {
                 + "|_____\\___|_| |_|\\___/ \n";
         String salutation = "Hello! I'm " + name + ".\n" +
                 "How can I help?";
-        return echo(banner + "\n" + salutation);
+        return echo(banner, salutation);
     }
 
     /**
@@ -51,12 +51,12 @@ public class Ui {
     }
 
     /**
-     * Sends the input message wrapped by separator defined in {@link Ui#Ui(String, String)}
+     * Sends the input messages wrapped by separator defined in {@link Ui#Ui(String, String)}
      * or the default separator in the case the no-arg constructor {@link Ui#Ui()} is called.
-     * @param input input message to be wrapped by the separator.
+     * @param lines lines of messages to be wrapped by the separator.
      */
-    public String echo(String input) {
-        return separator + '\n' + input + '\n' + separator + '\n';
+    public String echo(String ... lines) {
+        return separator + '\n' + String.join("\n", lines) + '\n' + separator + '\n';
     }
 
     /**

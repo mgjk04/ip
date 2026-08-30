@@ -1,5 +1,7 @@
 package echo;
 
+import java.nio.file.Path;
+
 import echo.command.Command;
 import echo.exception.EchoException;
 import echo.exception.StorageException;
@@ -8,7 +10,6 @@ import echo.storage.Storage;
 import echo.task.TaskList;
 import echo.ui.Ui;
 
-import java.nio.file.Path;
 
 /**
  * Entry point of the Echo chatbot application. Wires together the task list,
