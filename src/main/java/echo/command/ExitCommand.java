@@ -10,9 +10,11 @@ import echo.ui.Ui;
 public class ExitCommand extends Command {
     /**
      * Does nothing itself; Echo prints its farewell once the loop ends.
+     * See: {@link Command#execute(TaskList, Ui, Storage)}
      */
     @Override
-    public void execute(TaskList taskList, Ui ui, Storage storage) {
+    public String execute(TaskList taskList, Ui ui, Storage storage) {
+        return ui.farewell();
     }
 
     /**

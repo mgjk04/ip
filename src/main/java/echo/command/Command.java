@@ -19,9 +19,10 @@ public abstract class Command {
      * @param taskList task list to operate on
      * @param ui output channel for user-facing messages
      * @param storage persistence layer for saving mutations
+     * @return response of Echo
      * @throws EchoException when the action fails, e.g. an unknown task number
      */
-    public abstract void execute(TaskList taskList, Ui ui, Storage storage) throws EchoException;
+    public abstract String execute(TaskList taskList, Ui ui, Storage storage) throws EchoException;
 
     /**
      * Indicates whether executing this command should end the program.

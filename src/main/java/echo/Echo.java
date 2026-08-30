@@ -9,7 +9,6 @@ import echo.task.TaskList;
 import echo.ui.Ui;
 
 import java.nio.file.Path;
-import java.util.Scanner;
 
 /**
  * Entry point of the Echo chatbot application. Wires together the task list,
@@ -20,6 +19,7 @@ public class Echo {
     private final Ui ui = new Ui();
     private final Storage storage;
     private final Parser parser = new Parser();
+    private Command prevCommand = null;
 
     /**
      * Instantiates {@link Echo} chatbot instance with default
@@ -38,39 +38,33 @@ public class Echo {
     }
 
     /**
-     * Runs the chatbot: loads any previously saved tasks, greets the user,
-     * then parses one command per line and lets each command execute itself
-     * against the task list until {@code bye} or input ends. Finally, print
-     * farewell.
+     * Starts the chatbot: loads any previously saved tasks, greets the user.
      */
-    private void run() {
-        Scanner scanner = new Scanner(System.in);
+    public String start() {
         try {
             taskList.addAll(storage.read());
         } catch (StorageException e) {
             ui.showError(e);
         }
-        ui.greet();
-        boolean isExit = false;
-        while (!isExit && scanner.hasNextLine()) {
-            try {
-                Command cmd = parser.parse(scanner.nextLine());
-                cmd.execute(taskList, ui, storage);
-                isExit = cmd.isExit();
-            } catch (EchoException exception) {
-                ui.showError(exception);
-            }
-        }
-        ui.farewell();
-        scanner.close();
+        return ui.greet();
+    }
+
+    public boolean isExit() {
+        return prevCommand != null && prevCommand.isExit();
     }
 
     /**
-     * Starts a chatbot with the default save file path.
-     *
-     * @param args command-line arguments (unused)
+     * Processes the user input and returns Echo's response
+     * @param input user input
+     * @return Echo's output
      */
-    public static void main(String[] args) {
-        new Echo().run();
+    public String getResponse(String input) {
+        try {
+            Command cmd = parser.parse(input);
+            prevCommand = cmd;
+            return cmd.execute(taskList, ui, storage);
+        } catch (EchoException exception) {
+            return ui.showError(exception);
+        }
     }
 }

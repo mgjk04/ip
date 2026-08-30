@@ -30,15 +30,17 @@ public class MarkCommand extends Command {
      * Updates the task's status, saves the list, and confirms the change.
      */
     @Override
-    public void execute(TaskList taskList, Ui ui, Storage storage) throws EchoException {
+    public String execute(TaskList taskList, Ui ui, Storage storage) throws EchoException {
         Task task = taskList.getTask(index);
+        String response = "";
         if (done) {
             task.markDone();
-            ui.echo("Nice! I've marked this task as done:\n" + task.toString());
+            response = ui.echo("Nice! I've marked this task as done:\n" + task.toString());
         } else {
             task.markUnDone();
-            ui.echo("OK, I've marked this task as not done yet:\n" + task.toString());
+            response = ui.echo("OK, I've marked this task as not done yet:\n" + task.toString());
         }
         storage.save(taskList.getAll());
+        return response;
     }
 }

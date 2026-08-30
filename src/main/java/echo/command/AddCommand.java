@@ -23,12 +23,13 @@ public class AddCommand extends Command {
 
     /**
      * Appends the task, saves the list, and confirms the addition.
+     * See: {@link Command#execute(TaskList, Ui, Storage)}
      */
     @Override
-    public void execute(TaskList taskList, Ui ui, Storage storage) throws EchoException {
+    public String execute(TaskList taskList, Ui ui, Storage storage) throws EchoException {
         taskList.add(task);
         storage.save(taskList.getAll());
-        ui.echo("Got it. I've added this task:\n" + task.toString()
+        return ui.echo("Got it. I've added this task:\n" + task.toString()
                 + "\nNow you have " + taskList.size() + " tasks in the list.");
     }
 }
