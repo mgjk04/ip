@@ -29,7 +29,8 @@ public class AddCommand extends Command {
     public String execute(TaskList taskList, Ui ui, Storage storage) throws EchoException {
         taskList.add(task);
         storage.save(taskList.getAll());
-        return ui.echo("Got it. I've added this task:\n" + task.toString()
-                + "\nNow you have " + taskList.size() + " tasks in the list.");
+        return ui.echo("Got it. I've added this task:",
+                task.toString(),
+                "Now you have " + taskList.size() + " tasks in the list.");
     }
 }

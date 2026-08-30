@@ -35,10 +35,10 @@ public class MarkCommand extends Command {
         String response = "";
         if (done) {
             task.markDone();
-            response = ui.echo("Nice! I've marked this task as done:\n" + task.toString());
+            response = ui.echo("Nice! I've marked this task as done:", task.toString());
         } else {
             task.markUnDone();
-            response = ui.echo("OK, I've marked this task as not done yet:\n" + task.toString());
+            response = ui.echo("OK, I've marked this task as not done yet:", task.toString());
         }
         storage.save(taskList.getAll());
         return response;
