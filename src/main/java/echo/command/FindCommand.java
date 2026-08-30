@@ -23,7 +23,7 @@ public class FindCommand extends Command {
      * listing does not change any task.
      */
     @Override
-    public void execute(TaskList taskList, Ui ui, Storage storage) {
-        ui.echo(taskList.searchListText(searchText));
+    public String execute(TaskList taskList, Ui ui, Storage storage) {
+        return ui.echo(taskList.searchListText(searchText));
     }
 }

@@ -13,7 +13,7 @@ public class ListCommand extends Command {
      * listing does not change any task.
      */
     @Override
-    public void execute(TaskList taskList, Ui ui, Storage storage) {
-        ui.echo(taskList.asListText());
+    public String execute(TaskList taskList, Ui ui, Storage storage) {
+        return ui.echo(taskList.asListText());
     }
 }

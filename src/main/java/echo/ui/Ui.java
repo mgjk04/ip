@@ -31,7 +31,7 @@ public class Ui {
     /**
      * Sends the salutation message.
      */
-    public void greet() {
+    public String greet() {
         String banner = " _____     _           \n"
                 + "| ____|___| |__   ___  \n"
                 + "|  _| / __| '_ \\ / _ \\ \n"
@@ -39,15 +39,15 @@ public class Ui {
                 + "|_____\\___|_| |_|\\___/ \n";
         String salutation = "Hello! I'm " + name + ".\n" +
                 "How can I help?";
-        echo(banner + "\n" + salutation);
+        return echo(banner + "\n" + salutation);
     }
 
     /**
      * Sends the valediction message.
      */
-    public void farewell() {
+    public String farewell() {
         String valediction = "Bye!";
-        echo(valediction);
+        return echo(valediction);
     }
 
     /**
@@ -55,18 +55,16 @@ public class Ui {
      * or the default separator in the case the no-arg constructor {@link Ui#Ui()} is called.
      * @param input input message to be wrapped by the separator.
      */
-    public void echo(String input) {
-        System.out.println(separator);
-        System.out.println(input);
-        System.out.println(separator);
+    public String echo(String input) {
+        return separator + '\n' + input + '\n' + separator + '\n';
     }
 
     /**
      * Shows the error message related to an {@link EchoException}.
      * @param e {@link EchoException} which error message to display
      */
-    public void showError(EchoException e) {
-        echo(e.getMessage());
+    public String showError(EchoException e) {
+        return echo(e.getMessage());
     }
 
 }
