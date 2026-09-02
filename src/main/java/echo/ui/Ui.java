@@ -4,28 +4,24 @@ import echo.exception.EchoException;
 
 /**
  * Handles all interaction with the user: greeting, echoing command feedback,
- * and showing error messages, each framed by a separator line.
+ * and showing error messages.
  */
 public class Ui {
     private final String name;
-    private final String separator;
 
     /**
      * Instantiates {@link Ui} class with default parameters.
      */
     public Ui() {
         this.name = "Echo";
-        this.separator = "============================================================";
     }
 
     /**
-     * Instantiates {@link Ui} class with custom parameters.
+     * Instantiates {@link Ui} class with a custom name.
      * @param name name of chatbot
-     * @param separator separator between messages
      */
-    public Ui(String name, String separator) {
+    public Ui(String name) {
         this.name = name;
-        this.separator = separator;
     }
 
     /**
@@ -51,12 +47,11 @@ public class Ui {
     }
 
     /**
-     * Sends the input message wrapped by separator defined in {@link Ui#Ui(String, String)}
-     * or the default separator in the case the no-arg constructor {@link Ui#Ui()} is called.
-     * @param input input message to be wrapped by the separator.
+     * Sends the input message followed by a trailing newline.
+     * @param input input message to be shown.
      */
     public String echo(String input) {
-        return separator + '\n' + input + '\n' + separator + '\n';
+        return input + '\n';
     }
 
     /**
