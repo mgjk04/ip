@@ -1,10 +1,13 @@
 package echo.task;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import echo.exception.InvalidTaskNumberException;
 import echo.storage.Storage;
 
-import java.util.ArrayList;
-import java.util.List;
+
 
 /**
  * Owns the collection of {@link Task} objects and provides operations on it,
@@ -115,18 +118,10 @@ public class TaskList {
      *         full-list numbers; header only when nothing matches
      */
     public String searchListText(String searchText) {
-        StringBuilder listTxt = new StringBuilder("Here are the matching tasks in your list:\n");
-        boolean isFirstMatch = true;
-        for (int i = 1; i <= tasks.size(); ++i) {
-            if (!tasks.get(i - 1).getDescription().contains(searchText)) {
-                continue;
-            }
-            if (!isFirstMatch) {
-                listTxt.append("\n");
-            }
-            isFirstMatch = false;
-            listTxt.append(i).append(".").append(tasks.get(i - 1).toString());
-        }
-        return listTxt.toString();
+        return "Here are the matching tasks in your list:\n"
+                + IntStream.range(0, tasks.size())
+                .filter(index -> tasks.get(index).getDescription().contains(searchText))
+                .mapToObj(index -> (index + 1) + "." + tasks.get(index))
+                .collect(Collectors.joining("\n"));
     }
 }
