@@ -117,13 +117,10 @@ public class Parser {
         requireSavable(description);
         requireSavable(dueDateTime);
 
-        try {
-            LocalDateTime by = LocalDateTime.parse(dueDateTime, DateTimeUtility.INPUT);
-            return new AddCommand(new Deadline(description, by));
-        } catch (DateTimeParseException exception) {
-            throw new DeadlineFormatException();
-        }
+        LocalDateTime by = parseDateTime(dueDateTime, new DeadlineFormatException());
+        return new AddCommand(new Deadline(description, by));
     }
+
     /**
      * Parses the string arguments according to what is expected
      * of the event command and returns a {@link Command}.
@@ -152,12 +149,17 @@ public class Parser {
         requireSavable(startDateTime);
         requireSavable(endDateTime);
 
+        LocalDateTime from = parseDateTime(startDateTime, new EventFormatException());
+        LocalDateTime to = parseDateTime(endDateTime, new EventFormatException());
+        return new AddCommand(new Event(description, from, to));
+    }
+
+    private LocalDateTime parseDateTime(String dateTimeText, EchoException invalidFormatError)
+            throws EchoException {
         try {
-            LocalDateTime from = LocalDateTime.parse(startDateTime, DateTimeUtility.INPUT);
-            LocalDateTime to = LocalDateTime.parse(endDateTime, DateTimeUtility.INPUT);
-            return new AddCommand(new Event(description, from, to));
+            return LocalDateTime.parse(dateTimeText, DateTimeUtility.INPUT);
         } catch (DateTimeParseException exception) {
-            throw new EventFormatException();
+            throw invalidFormatError;
         }
     }
 
