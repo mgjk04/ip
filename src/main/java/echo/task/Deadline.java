@@ -1,8 +1,9 @@
 package echo.task;
 
+import java.time.LocalDateTime;
+
 import echo.utils.DateTimeUtility;
 
-import java.time.LocalDateTime;
 
 /**
  * Represents a task that needs to be done before a specific date-time.

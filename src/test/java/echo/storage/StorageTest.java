@@ -1,21 +1,23 @@
 package echo.storage;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import echo.exception.StorageException;
 import echo.task.Deadline;
 import echo.task.Event;
 import echo.task.Task;
 import echo.task.Todo;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 // Class with Opencode contribution
 /**
  * Tests {@link Storage} save/read round-trips using a temporary directory
@@ -54,7 +56,7 @@ public class StorageTest {
         ArrayList<Task> saved = sampleTasks();
 
         storage.save(saved);
-        ArrayList<Task> loaded = storage.read();
+        List<Task> loaded = storage.read();
 
         assertEquals(saved.size(), loaded.size());
         for (int i = 0; i < saved.size(); i++) {
@@ -85,7 +87,7 @@ public class StorageTest {
         Path file = tempDir.resolve("blanks.txt");
         Files.writeString(file, "\n\nT | 0 | read book\n   \n");
 
-        ArrayList<Task> tasks = new Storage(file).read();
+        List<Task> tasks = new Storage(file).read();
 
         assertEquals(1, tasks.size());
         assertEquals("[T][ ] read book", tasks.get(0).toString());

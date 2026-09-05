@@ -1,4 +1,12 @@
 package echo.parser;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.nio.file.Path;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import echo.command.AddCommand;
 import echo.command.DeleteCommand;
@@ -12,7 +20,6 @@ import echo.exception.EchoException;
 import echo.exception.EventFormatException;
 import echo.exception.FindFormatException;
 import echo.exception.InvalidTaskNumberException;
-import echo.exception.TaskNumberFormatException;
 import echo.exception.TodoFormatException;
 import echo.exception.UnknownCommandException;
 import echo.storage.Storage;
@@ -20,14 +27,7 @@ import echo.task.Deadline;
 import echo.task.TaskList;
 import echo.task.Todo;
 import echo.ui.Ui;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
-import java.nio.file.Path;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@link Parser#parse(String)}: command routing, argument validation,
@@ -55,8 +55,7 @@ public class ParserTest {
 
     @Test
     public void parse_unknownKeyword_exceptionThrown() {
-        assertThrows(UnknownCommandException.class,
-                () -> new Parser().parse("frobnicate"));
+        assertThrows(UnknownCommandException.class, () -> new Parser().parse("frobnicate"));
     }
 
     @Test
@@ -83,8 +82,7 @@ public class ParserTest {
     public void parse_todoContainingPipe_rejected() {
         // Pipes are reserved for the save-file format, so they must never
         // reach a task description.
-        assertThrows(EchoException.class,
-                () -> new Parser().parse("todo read | book"));
+        assertThrows(EchoException.class, () -> new Parser().parse("todo read | book"));
     }
 
     @Test
@@ -99,14 +97,12 @@ public class ParserTest {
 
     @Test
     public void parse_deadlineWithoutByClause_exceptionThrown() {
-        assertThrows(DeadlineFormatException.class,
-                () -> new Parser().parse("deadline return book"));
+        assertThrows(DeadlineFormatException.class, () -> new Parser().parse("deadline return book"));
     }
 
     @Test
     public void parse_deadlineInvalidDate_exceptionThrown() {
-        assertThrows(DeadlineFormatException.class,
-                () -> new Parser().parse("deadline return book /by tomorrow"));
+        assertThrows(DeadlineFormatException.class, () -> new Parser().parse("deadline return book /by tomorrow"));
     }
 
     @Test
@@ -123,15 +119,13 @@ public class ParserTest {
 
     @Test
     public void parse_eventMissingToClause_exceptionThrown() {
-        assertThrows(EventFormatException.class,
-                () -> new Parser().parse(
+        assertThrows(EventFormatException.class, () -> new Parser().parse(
                         "event meeting /from 2025-01-15 1800"));
     }
 
     @Test
     public void parse_eventInvalidDate_exceptionThrown() {
-        assertThrows(EventFormatException.class,
-                () -> new Parser().parse(
+        assertThrows(EventFormatException.class, () -> new Parser().parse(
                         "event meeting /from 2025-01-15 1800 /to sometime"));
     }
 
@@ -139,14 +133,12 @@ public class ParserTest {
     public void parse_markNonNumericIndex_exceptionThrown() {
         // Note: unlike delete (DeleteFormatException for both cases), mark
         // reports a non-numeric index as InvalidTaskNumberException.
-        assertThrows(InvalidTaskNumberException.class,
-                () -> new Parser().parse("mark abc"));
+        assertThrows(InvalidTaskNumberException.class, () -> new Parser().parse("mark abc"));
     }
 
     @Test
     public void parse_deleteNonNumericIndex_exceptionThrown() {
-        assertThrows(DeleteFormatException.class,
-                () -> new Parser().parse("delete two"));
+        assertThrows(DeleteFormatException.class, () -> new Parser().parse("delete two"));
     }
 
     @Test

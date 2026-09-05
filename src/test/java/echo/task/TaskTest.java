@@ -1,12 +1,13 @@
 package echo.task;
-
-import echo.exception.CorruptFormatException;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
+
+import echo.exception.CorruptFormatException;
+
 
 //Class with Opencode contribution
 /**
@@ -68,38 +69,32 @@ public class TaskTest {
 
     @Test
     public void fromSaveFormat_unknownTypeLetter_exceptionThrown() {
-        assertThrows(CorruptFormatException.class,
-                () -> Task.fromSaveFormat("X | 0 | mystery"));
+        assertThrows(CorruptFormatException.class, () -> Task.fromSaveFormat("X | 0 | mystery"));
     }
 
     @Test
     public void fromSaveFormat_tooFewFields_exceptionThrown() {
-        assertThrows(CorruptFormatException.class,
-                () -> Task.fromSaveFormat("T | 0"));
+        assertThrows(CorruptFormatException.class, () -> Task.fromSaveFormat("T | 0"));
     }
 
     @Test
     public void fromSaveFormat_completionFlagNotZeroOrOne_exceptionThrown() {
-        assertThrows(CorruptFormatException.class,
-                () -> Task.fromSaveFormat("T | 2 | read book"));
+        assertThrows(CorruptFormatException.class, () -> Task.fromSaveFormat("T | 2 | read book"));
     }
 
     @Test
     public void fromSaveFormat_emptyDescription_exceptionThrown() {
-        assertThrows(CorruptFormatException.class,
-                () -> Task.fromSaveFormat("D | 0 |  | " + ISO_DATE));
+        assertThrows(CorruptFormatException.class, () -> Task.fromSaveFormat("D | 0 |  | " + ISO_DATE));
     }
 
     @Test
     public void fromSaveFormat_invalidDeadlineDate_exceptionThrown() {
-        assertThrows(CorruptFormatException.class,
-                () -> Task.fromSaveFormat("D | 0 | return book | not-a-date"));
+        assertThrows(CorruptFormatException.class, () -> Task.fromSaveFormat("D | 0 | return book | not-a-date"));
     }
 
     @Test
     public void fromSaveFormat_invalidEventDate_exceptionThrown() {
-        assertThrows(CorruptFormatException.class,
-                () -> Task.fromSaveFormat(
+        assertThrows(CorruptFormatException.class, () -> Task.fromSaveFormat(
                         "E | 0 | meeting | " + ISO_DATE + " | nope"));
     }
 }
