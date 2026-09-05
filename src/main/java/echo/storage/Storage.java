@@ -1,14 +1,14 @@
 package echo.storage;
-
-import echo.exception.StorageException;
-import echo.task.Task;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import echo.exception.StorageException;
+import echo.task.Task;
+
 
 /**
  * Saves the task list to a file on disk.

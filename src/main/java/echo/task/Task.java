@@ -1,9 +1,9 @@
 package echo.task;
+import java.time.format.DateTimeParseException;
 
 import echo.exception.CorruptFormatException;
 import echo.exception.StorageException;
 
-import java.time.format.DateTimeParseException;
 
 /**
  * Represents a task description and whether the task has been completed.

@@ -1,10 +1,11 @@
 package echo.task;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import echo.exception.InvalidTaskNumberException;
 import echo.storage.Storage;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Owns the collection of {@link Task} objects and provides operations on it,

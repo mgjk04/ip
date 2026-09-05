@@ -1,8 +1,8 @@
 package echo.task;
+import java.time.LocalDateTime;
 
 import echo.utils.DateTimeUtility;
 
-import java.time.LocalDateTime;
 
 /**
  * Represents a task that starts and ends at specific date-times.

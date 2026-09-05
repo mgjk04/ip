@@ -1,28 +1,28 @@
 package echo.parser;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 
 import echo.command.AddCommand;
 import echo.command.Command;
 import echo.command.DeleteCommand;
 import echo.command.ExitCommand;
+import echo.command.FindCommand;
 import echo.command.ListCommand;
 import echo.command.MarkCommand;
-import echo.command.FindCommand;
+import echo.exception.DeadlineFormatException;
 import echo.exception.DeleteFormatException;
 import echo.exception.EchoException;
+import echo.exception.EventFormatException;
 import echo.exception.FindFormatException;
 import echo.exception.InvalidTaskNumberException;
 import echo.exception.TaskNumberFormatException;
-import echo.exception.UnknownCommandException;
 import echo.exception.TodoFormatException;
-import echo.exception.DeadlineFormatException;
-import echo.exception.EventFormatException;
+import echo.exception.UnknownCommandException;
 import echo.task.Deadline;
 import echo.task.Event;
 import echo.task.Todo;
 import echo.utils.DateTimeUtility;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 
 /**
  * Converts a line entered by the user into an executable {@link Command}.
@@ -43,19 +43,19 @@ public class Parser {
         String arguments = trimmedInput.substring(keyword.length()).trim();
 
         return switch (keyword) {
-        case "bye" -> new ExitCommand();
-        case "list" -> new ListCommand();
-        case "todo" -> parseTodo(arguments);
-        case "deadline" -> parseDeadline(arguments);
-        case "event" -> parseEvent(arguments);
-        case "mark" -> new MarkCommand(parseIndex(arguments,
-                new TaskNumberFormatException("mark"), new InvalidTaskNumberException()), true);
-        case "unmark" -> new MarkCommand(parseIndex(arguments,
-                new TaskNumberFormatException("unmark"), new InvalidTaskNumberException()), false);
-        case "delete" -> new DeleteCommand(parseIndex(arguments,
-                new DeleteFormatException(), new DeleteFormatException()));
-        case "find" -> parseFind(arguments);
-        default -> throw new UnknownCommandException();
+            case "bye" -> new ExitCommand();
+            case "list" -> new ListCommand();
+            case "todo" -> parseTodo(arguments);
+            case "deadline" -> parseDeadline(arguments);
+            case "event" -> parseEvent(arguments);
+            case "mark" -> new MarkCommand(parseIndex(arguments,
+                    new TaskNumberFormatException("mark"), new InvalidTaskNumberException()), true);
+            case "unmark" -> new MarkCommand(parseIndex(arguments,
+                    new TaskNumberFormatException("unmark"), new InvalidTaskNumberException()), false);
+            case "delete" -> new DeleteCommand(parseIndex(arguments,
+                    new DeleteFormatException(), new DeleteFormatException()));
+            case "find" -> parseFind(arguments);
+            default -> throw new UnknownCommandException();
         };
     }
 
