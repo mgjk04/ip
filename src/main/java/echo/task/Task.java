@@ -1,15 +1,22 @@
 package echo.task;
+import java.time.format.DateTimeParseException;
 
 import echo.exception.CorruptFormatException;
 import echo.exception.StorageException;
 
-import java.time.format.DateTimeParseException;
 
 /**
  * Represents a task description and whether the task has been completed.
  * Class with Codex contribution.
  */
 public class Task {
+    private static final String DONE_FLAG = "1";
+    private static final String UNDONE_FLAG = "0";
+    private static final String FIELD_SEPARATOR_REGEX = " \\| ";
+    private static final String TODO_TYPE = "T";
+    private static final String DEADLINE_TYPE = "D";
+    private static final String EVENT_TYPE = "E";
+
     private final String description;
     private boolean isDone;
 
@@ -48,7 +55,7 @@ public class Task {
      * and append any extra fields.
      */
     public String toSaveFormat() {
-        return (this.isDone ? "1" : "0") + " | " + description;
+        return (this.isDone ? DONE_FLAG : UNDONE_FLAG) + " | " + description;
     }
 
     /**
@@ -62,26 +69,39 @@ public class Task {
      * @throws StorageException when the line does not follow the save format
      */
     public static Task fromSaveFormat(String saveFormat) throws StorageException {
-        String[] fields = saveFormat.split(" \\| ");
-        if (fields.length < 3 || fields[1].isEmpty() || fields[2].isEmpty()
-                || !(fields[1].equals("0") || fields[1].equals("1"))) {
+        String[] fields = saveFormat.split(FIELD_SEPARATOR_REGEX);
+        if (!hasValidBaseFields(fields)) {
             throw new CorruptFormatException(saveFormat);
         }
         try {
-            Task task = switch (fields[0]) {
-                case "T" -> Todo.fromSaveFormat(fields);
-                case "D" -> Deadline.fromSaveFormat(fields);
-                case "E" -> Event.fromSaveFormat(fields);
-                default -> throw new CorruptFormatException(saveFormat);
-            };
-            assert task != null : "A supported task type must reconstruct to a task.";
-            if (fields[1].equals("1")) {
+            Task task = createTask(fields, saveFormat);
+            if (fields[1].equals(DONE_FLAG)) {
                 task.markDone();
             }
             return task;
         } catch (IllegalArgumentException | DateTimeParseException e) {
             throw new CorruptFormatException(saveFormat);
         }
+    }
+
+    private static boolean hasValidBaseFields(String[] fields) {
+        return fields.length >= 3
+                && !fields[1].isEmpty()
+                && !fields[2].isEmpty()
+                && isCompletionFlag(fields[1]);
+    }
+
+    private static boolean isCompletionFlag(String flag) {
+        return flag.equals(UNDONE_FLAG) || flag.equals(DONE_FLAG);
+    }
+
+    private static Task createTask(String[] fields, String saveFormat) throws CorruptFormatException {
+        return switch (fields[0]) {
+            case TODO_TYPE -> Todo.fromSaveFormat(fields);
+            case DEADLINE_TYPE -> Deadline.fromSaveFormat(fields);
+            case EVENT_TYPE -> Event.fromSaveFormat(fields);
+            default -> throw new CorruptFormatException(saveFormat);
+        };
     }
 
     /**

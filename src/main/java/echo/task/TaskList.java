@@ -1,10 +1,12 @@
 package echo.task;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import echo.exception.InvalidTaskNumberException;
 import echo.storage.Storage;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Owns the collection of {@link Task} objects and provides operations on it,
@@ -53,10 +55,10 @@ public class TaskList {
      * Returns all tasks so they can be processed elsewhere,
      * e.g. saved to disk by {@link Storage}.
      *
-     * @return live view of the tasks in list order
+     * @return unmodifiable view of the tasks in list order
      */
     public List<Task> getAll() {
-        return tasks;
+        return Collections.unmodifiableList(tasks);
     }
 
     /**
@@ -98,11 +100,11 @@ public class TaskList {
      */
     public String asListText() {
         StringBuilder listTxt = new StringBuilder("Here are the tasks in your list:\n");
-        for (int i = 1; i <= tasks.size(); ++i) {
-            listTxt.append(i).append(".").append(tasks.get(i - 1).toString());
-            if (i != tasks.size()) {
+        for (int i = 0; i < tasks.size(); i++) {
+            if (i > 0) {
                 listTxt.append("\n");
             }
+            appendNumberedTask(listTxt, i);
         }
         return listTxt.toString();
     }
@@ -120,16 +122,20 @@ public class TaskList {
     public String searchListText(String searchText) {
         StringBuilder listTxt = new StringBuilder("Here are the matching tasks in your list:\n");
         boolean isFirstMatch = true;
-        for (int i = 1; i <= tasks.size(); ++i) {
-            if (!tasks.get(i - 1).getDescription().contains(searchText)) {
+        for (int i = 0; i < tasks.size(); i++) {
+            if (!tasks.get(i).getDescription().contains(searchText)) {
                 continue;
             }
             if (!isFirstMatch) {
                 listTxt.append("\n");
             }
             isFirstMatch = false;
-            listTxt.append(i).append(".").append(tasks.get(i - 1).toString());
+            appendNumberedTask(listTxt, i);
         }
         return listTxt.toString();
+    }
+
+    private void appendNumberedTask(StringBuilder listTxt, int taskIndex) {
+        listTxt.append(taskIndex + 1).append(".").append(tasks.get(taskIndex));
     }
 }

@@ -1,28 +1,28 @@
 package echo.parser;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 
 import echo.command.AddCommand;
 import echo.command.Command;
 import echo.command.DeleteCommand;
 import echo.command.ExitCommand;
+import echo.command.FindCommand;
 import echo.command.ListCommand;
 import echo.command.MarkCommand;
-import echo.command.FindCommand;
+import echo.exception.DeadlineFormatException;
 import echo.exception.DeleteFormatException;
 import echo.exception.EchoException;
+import echo.exception.EventFormatException;
 import echo.exception.FindFormatException;
 import echo.exception.InvalidTaskNumberException;
 import echo.exception.TaskNumberFormatException;
-import echo.exception.UnknownCommandException;
 import echo.exception.TodoFormatException;
-import echo.exception.DeadlineFormatException;
-import echo.exception.EventFormatException;
+import echo.exception.UnknownCommandException;
 import echo.task.Deadline;
 import echo.task.Event;
 import echo.task.Todo;
 import echo.utils.DateTimeUtility;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 
 /**
  * Converts a line entered by the user into an executable {@link Command}.
@@ -30,6 +30,19 @@ import java.time.format.DateTimeParseException;
  * the command against the task list happens later in {@link Command#execute}.
  */
 public class Parser {
+    private static final String BYE_COMMAND = "bye";
+    private static final String LIST_COMMAND = "list";
+    private static final String TODO_COMMAND = "todo";
+    private static final String DEADLINE_COMMAND = "deadline";
+    private static final String EVENT_COMMAND = "event";
+    private static final String MARK_COMMAND = "mark";
+    private static final String UNMARK_COMMAND = "unmark";
+    private static final String DELETE_COMMAND = "delete";
+    private static final String FIND_COMMAND = "find";
+    private static final String BY_SEPARATOR = " /by ";
+    private static final String FROM_SEPARATOR = " /from ";
+    private static final String TO_SEPARATOR = " /to ";
+
     /**
      * Parses one user-input line into a ready-to-run command.
      *
@@ -43,19 +56,19 @@ public class Parser {
         String arguments = trimmedInput.substring(keyword.length()).trim();
 
         return switch (keyword) {
-        case "bye" -> new ExitCommand();
-        case "list" -> new ListCommand();
-        case "todo" -> parseTodo(arguments);
-        case "deadline" -> parseDeadline(arguments);
-        case "event" -> parseEvent(arguments);
-        case "mark" -> new MarkCommand(parseIndex(arguments,
-                new TaskNumberFormatException("mark"), new InvalidTaskNumberException()), true);
-        case "unmark" -> new MarkCommand(parseIndex(arguments,
-                new TaskNumberFormatException("unmark"), new InvalidTaskNumberException()), false);
-        case "delete" -> new DeleteCommand(parseIndex(arguments,
-                new DeleteFormatException(), new DeleteFormatException()));
-        case "find" -> parseFind(arguments);
-        default -> throw new UnknownCommandException();
+            case BYE_COMMAND -> new ExitCommand();
+            case LIST_COMMAND -> new ListCommand();
+            case TODO_COMMAND -> parseTodo(arguments);
+            case DEADLINE_COMMAND -> parseDeadline(arguments);
+            case EVENT_COMMAND -> parseEvent(arguments);
+            case MARK_COMMAND -> new MarkCommand(parseIndex(arguments,
+                    new TaskNumberFormatException(MARK_COMMAND), new InvalidTaskNumberException()), true);
+            case UNMARK_COMMAND -> new MarkCommand(parseIndex(arguments,
+                    new TaskNumberFormatException(UNMARK_COMMAND), new InvalidTaskNumberException()), false);
+            case DELETE_COMMAND -> new DeleteCommand(parseIndex(arguments,
+                    new DeleteFormatException(), new DeleteFormatException()));
+            case FIND_COMMAND -> parseFind(arguments);
+            default -> throw new UnknownCommandException();
         };
     }
 
@@ -91,7 +104,7 @@ public class Parser {
     }
 
     private Command parseDeadline(String arguments) throws EchoException {
-        String[] parts = arguments.split(" /by ", 2);
+        String[] parts = arguments.split(BY_SEPARATOR, 2);
         if (parts.length != 2) {
             throw new DeadlineFormatException();
         }
@@ -104,13 +117,10 @@ public class Parser {
         requireSavable(description);
         requireSavable(dueDateTime);
 
-        try {
-            LocalDateTime by = LocalDateTime.parse(dueDateTime, DateTimeUtility.INPUT);
-            return new AddCommand(new Deadline(description, by));
-        } catch (DateTimeParseException exception) {
-            throw new DeadlineFormatException();
-        }
+        LocalDateTime by = parseDateTime(dueDateTime, new DeadlineFormatException());
+        return new AddCommand(new Deadline(description, by));
     }
+
     /**
      * Parses the string arguments according to what is expected
      * of the event command and returns a {@link Command}.
@@ -120,11 +130,11 @@ public class Parser {
      * @throws EchoException if the arguments do not adhere to the event format
      */
     private Command parseEvent(String arguments) throws EchoException {
-        String[] descriptionAndSchedule = arguments.split(" /from ", 2);
+        String[] descriptionAndSchedule = arguments.split(FROM_SEPARATOR, 2);
         if (descriptionAndSchedule.length != 2) {
             throw new EventFormatException();
         }
-        String[] times = descriptionAndSchedule[1].split(" /to ", 2);
+        String[] times = descriptionAndSchedule[1].split(TO_SEPARATOR, 2);
         if (times.length != 2) {
             throw new EventFormatException();
         }
@@ -139,12 +149,17 @@ public class Parser {
         requireSavable(startDateTime);
         requireSavable(endDateTime);
 
+        LocalDateTime from = parseDateTime(startDateTime, new EventFormatException());
+        LocalDateTime to = parseDateTime(endDateTime, new EventFormatException());
+        return new AddCommand(new Event(description, from, to));
+    }
+
+    private LocalDateTime parseDateTime(String dateTimeText, EchoException invalidFormatError)
+            throws EchoException {
         try {
-            LocalDateTime from = LocalDateTime.parse(startDateTime, DateTimeUtility.INPUT);
-            LocalDateTime to = LocalDateTime.parse(endDateTime, DateTimeUtility.INPUT);
-            return new AddCommand(new Event(description, from, to));
+            return LocalDateTime.parse(dateTimeText, DateTimeUtility.INPUT);
         } catch (DateTimeParseException exception) {
-            throw new EventFormatException();
+            throw invalidFormatError;
         }
     }
 
