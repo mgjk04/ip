@@ -26,10 +26,11 @@ public class TaskList {
     /**
      * Appends a task to the end of the list.
      *
-     * @param t task to add
+     * @param task task to add
      */
-    public void add(Task t) {
-        tasks.add(t);
+    public void add(Task task) {
+        assert task != null : "A task list must not contain null tasks.";
+        tasks.add(task);
     }
 
     /**
@@ -84,8 +85,10 @@ public class TaskList {
      * @throws InvalidTaskNumberException when the index is not in the list
      */
     public Task delete(int index) throws InvalidTaskNumberException {
+        int originalSize = tasks.size();
         Task removed = getTask(index);
         tasks.remove(index);
+        assert tasks.size() == originalSize - 1 : "Deleting a valid task must reduce the task count by one.";
         return removed;
     }
 

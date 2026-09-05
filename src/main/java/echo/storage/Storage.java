@@ -44,8 +44,10 @@ public class Storage {
      * @throws StorageException when writing to the save file fails
      */
     public void save(List<Task> tasks) throws StorageException {
+        assert tasks != null : "Storage.save requires a task collection.";
         List<String> lines = new ArrayList<>();
         for (Task t : tasks) {
+            assert t != null : "A saved task collection must not contain null tasks.";
             lines.add(t.toSaveFormat());
         }
         try {
@@ -74,7 +76,9 @@ public class Storage {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine().trim();
                 if (!line.isEmpty()) {
-                    tasks.add(Task.fromSaveFormat(line));
+                    Task task = Task.fromSaveFormat(line);
+                    assert task != null : "A valid save record must reconstruct to a task.";
+                    tasks.add(task);
                 }
             }
             return tasks;

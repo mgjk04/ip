@@ -43,7 +43,9 @@ public class Echo {
      */
     public String start() {
         try {
-            taskList.addAll(storage.read());
+            var loadedTasks = storage.read();
+            assert loadedTasks != null : "Storage.read must return a task collection.";
+            taskList.addAll(loadedTasks);
         } catch (StorageException e) {
             ui.showError(e);
         }
