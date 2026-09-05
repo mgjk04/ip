@@ -125,14 +125,26 @@ public class TaskListTest {
 
     @Test
     public void getAll_afterLaterAddition_reflectsNewTask() {
-        // getAll is documented as a live view; Storage depends on this
-        // to see tasks added after it obtained the reference.
+        // The view remains current while preventing callers from changing
+        // the list structure directly.
         TaskList tasks = new TaskList();
         List<Task> view = tasks.getAll();
 
         tasks.add(new TaskStub("late arrival"));
 
         assertEquals(1, view.size());
+    }
+
+    @Test
+    public void getAll_attemptToModifyList_throwsException() {
+        TaskList tasks = new TaskList();
+        tasks.add(new TaskStub("only"));
+
+        List<Task> view = tasks.getAll();
+
+        assertThrows(UnsupportedOperationException.class,
+                () -> view.add(new TaskStub("bypassed API")));
+        assertEquals(1, tasks.size());
     }
 
     @Test

@@ -1,6 +1,7 @@
 package echo.task;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import echo.exception.InvalidTaskNumberException;
@@ -53,10 +54,10 @@ public class TaskList {
      * Returns all tasks so they can be processed elsewhere,
      * e.g. saved to disk by {@link Storage}.
      *
-     * @return live view of the tasks in list order
+     * @return unmodifiable view of the tasks in list order
      */
     public List<Task> getAll() {
-        return tasks;
+        return Collections.unmodifiableList(tasks);
     }
 
     /**
