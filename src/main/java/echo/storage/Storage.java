@@ -65,8 +65,8 @@ public class Storage {
      * @return tasks restored from the save file
      * @throws StorageException when reading fails or a line is malformed
      */
-    public ArrayList<Task> read() throws StorageException {
-        ArrayList<Task> tasks = new ArrayList<>();
+    public List<Task> read() throws StorageException {
+        List<Task> tasks = new ArrayList<>();
         if (!Files.exists(saveFile)) {
             return tasks;
         }

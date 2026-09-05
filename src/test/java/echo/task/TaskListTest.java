@@ -142,8 +142,7 @@ public class TaskListTest {
 
         List<Task> view = tasks.getAll();
 
-        assertThrows(UnsupportedOperationException.class,
-                () -> view.add(new TaskStub("bypassed API")));
+        assertThrows(UnsupportedOperationException.class, () -> view.add(new TaskStub("bypassed API")));
         assertEquals(1, tasks.size());
     }
 
