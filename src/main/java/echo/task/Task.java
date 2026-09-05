@@ -74,6 +74,7 @@ public class Task {
                 case "E" -> Event.fromSaveFormat(fields);
                 default -> throw new CorruptFormatException(saveFormat);
             };
+            assert task != null : "A supported task type must reconstruct to a task.";
             if (fields[1].equals("1")) {
                 task.markDone();
             }
