@@ -43,7 +43,7 @@ public class Deadline extends Task {
 
     /**
      * Reconstructs a deadline from its save-format fields (type letter,
-     * completion flag, description, due date).
+     * completion date-time, description, due date).
      *
      * @param fields the split save-file line for this deadline
      * @return the reconstructed deadline

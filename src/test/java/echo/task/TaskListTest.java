@@ -2,7 +2,9 @@ package echo.task;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -222,5 +224,51 @@ public class TaskListTest {
         tasks.add(new TaskStub("water plants"));
 
         assertFalse(tasks.searchListText("book").endsWith("\n"));
+    }
+
+    @Test
+    public void statisticsText_mixedTasks_returnsGlobalAndWeeklyCounts() {
+        TaskList tasks = new TaskList();
+        Todo completedTodo = new Todo("read book");
+        completedTodo.markDone(LocalDateTime.of(2026, 9, 7, 9, 30));
+        Deadline completedDeadline = new Deadline("return book", LocalDateTime.of(2026, 9, 8, 18, 0));
+        completedDeadline.markDone(LocalDateTime.of(2026, 8, 31, 23, 59));
+        Event completedEvent = new Event("meeting", LocalDateTime.of(2026, 9, 3, 10, 0),
+                LocalDateTime.of(2026, 9, 3, 11, 0));
+        completedEvent.markDone(LocalDateTime.of(2026, 9, 7, 12, 0));
+        tasks.add(completedTodo);
+        tasks.add(completedDeadline);
+        tasks.add(completedEvent);
+        tasks.add(new Todo("buy groceries"));
+
+        String expected = "Statistics:\n\n"
+                + "Global:\n"
+                + "Total Tasks: 4\n"
+                + "Total Completed: 3\n"
+                + "Total Incomplete: 1\n"
+                + "Todos Completed: 1\n"
+                + "Events Completed: 1\n"
+                + "Deadlines Completed: 1\n\n"
+                + "Week:\n"
+                + "Completed: 2\n"
+                + "Todos Completed: 1\n"
+                + "Events Completed: 1\n"
+                + "Deadlines Completed: 0";
+
+        assertEquals(expected, tasks.statisticsText(LocalDateTime.of(2026, 9, 7, 12, 0)));
+    }
+
+    @Test
+    public void statisticsText_completionAtMondayStart_countsInCurrentWeek() {
+        TaskList tasks = new TaskList();
+        Todo boundaryTask = new Todo("at boundary");
+        boundaryTask.markDone(LocalDateTime.of(2026, 9, 7, 0, 0));
+        Todo earlierTask = new Todo("before boundary");
+        earlierTask.markDone(LocalDateTime.of(2026, 9, 6, 23, 59));
+        tasks.add(boundaryTask);
+        tasks.add(earlierTask);
+
+        assertTrue(tasks.statisticsText(LocalDateTime.of(2026, 9, 7, 0, 0))
+                .contains("Completed: 1\nTodos Completed: 1"));
     }
 }

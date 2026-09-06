@@ -45,7 +45,7 @@ public class Event extends Task {
 
     /**
      * Reconstructs an event from its save-format fields (type letter,
-     * completion flag, description, start time, end time).
+     * completion date-time, description, start time, end time).
      *
      * @param fields the split save-file line for this event
      * @return the reconstructed event

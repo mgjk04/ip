@@ -37,7 +37,7 @@ public class StorageTest {
         tasks.add(new Todo("read book"));
         Deadline doneDeadline = new Deadline("return book",
                 LocalDateTime.of(2025, 1, 15, 18, 0));
-        doneDeadline.markDone();
+        doneDeadline.markDone(LocalDateTime.of(2025, 1, 13, 12, 45));
         tasks.add(doneDeadline);
         tasks.add(new Event("project meeting",
                 LocalDateTime.of(2025, 1, 15, 18, 30),
@@ -77,7 +77,7 @@ public class StorageTest {
     @Test
     public void read_corruptLine_throwsStorageException() throws Exception {
         Path file = tempDir.resolve("corrupt.txt");
-        Files.writeString(file, "T | 0 | fine line\nGARBAGE");
+        Files.writeString(file, "T | invalid-date | fine line\nGARBAGE");
 
         assertThrows(StorageException.class, () -> new Storage(file).read());
     }
@@ -85,11 +85,19 @@ public class StorageTest {
     @Test
     public void read_blankLines_skipped() throws Exception {
         Path file = tempDir.resolve("blanks.txt");
-        Files.writeString(file, "\n\nT | 0 | read book\n   \n");
+        Files.writeString(file, "\n\nT |  | read book\n   \n");
 
         List<Task> tasks = new Storage(file).read();
 
         assertEquals(1, tasks.size());
         assertEquals("[T][ ] read book", tasks.get(0).toString());
+    }
+
+    @Test
+    public void read_legacyCompletionFlag_throwsStorageException() throws Exception {
+        Path file = tempDir.resolve("legacy.txt");
+        Files.writeString(file, "T | 0 | read book");
+
+        assertThrows(StorageException.class, () -> new Storage(file).read());
     }
 }

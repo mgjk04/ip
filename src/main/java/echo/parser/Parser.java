@@ -9,12 +9,14 @@ import echo.command.ExitCommand;
 import echo.command.FindCommand;
 import echo.command.ListCommand;
 import echo.command.MarkCommand;
+import echo.command.StatsCommand;
 import echo.exception.DeadlineFormatException;
 import echo.exception.DeleteFormatException;
 import echo.exception.EchoException;
 import echo.exception.EventFormatException;
 import echo.exception.FindFormatException;
 import echo.exception.InvalidTaskNumberException;
+import echo.exception.StatsFormatException;
 import echo.exception.TaskNumberFormatException;
 import echo.exception.TodoFormatException;
 import echo.exception.UnknownCommandException;
@@ -39,6 +41,7 @@ public class Parser {
     private static final String UNMARK_COMMAND = "unmark";
     private static final String DELETE_COMMAND = "delete";
     private static final String FIND_COMMAND = "find";
+    private static final String STATS_COMMAND = "stats";
     private static final String BY_SEPARATOR = " /by ";
     private static final String FROM_SEPARATOR = " /from ";
     private static final String TO_SEPARATOR = " /to ";
@@ -68,6 +71,7 @@ public class Parser {
             case DELETE_COMMAND -> new DeleteCommand(parseIndex(arguments,
                     new DeleteFormatException(), new DeleteFormatException()));
             case FIND_COMMAND -> parseFind(arguments);
+            case STATS_COMMAND -> parseStats(arguments);
             default -> throw new UnknownCommandException();
         };
     }
@@ -101,6 +105,13 @@ public class Parser {
             throw new FindFormatException();
         }
         return new FindCommand(arguments);
+    }
+
+    private Command parseStats(String arguments) throws EchoException {
+        if (!arguments.isEmpty()) {
+            throw new StatsFormatException();
+        }
+        return new StatsCommand();
     }
 
     private Command parseDeadline(String arguments) throws EchoException {

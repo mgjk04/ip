@@ -1,5 +1,8 @@
 package echo.task;
+
+import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 
 import echo.exception.CorruptFormatException;
 import echo.exception.StorageException;
@@ -10,15 +13,13 @@ import echo.exception.StorageException;
  * Class with Codex contribution.
  */
 public class Task {
-    private static final String DONE_FLAG = "1";
-    private static final String UNDONE_FLAG = "0";
     private static final String FIELD_SEPARATOR_REGEX = " \\| ";
     private static final String TODO_TYPE = "T";
     private static final String DEADLINE_TYPE = "D";
     private static final String EVENT_TYPE = "E";
 
     private final String description;
-    private boolean isDone;
+    private LocalDateTime completedAt;
 
     /**
      * Creates an incomplete task with the given description.
@@ -27,7 +28,7 @@ public class Task {
      */
     public Task(String description) {
         this.description = description;
-        this.isDone = false;
+        this.completedAt = null;
     }
 
     /**
@@ -40,27 +41,43 @@ public class Task {
 
     /** Marks this task as complete. */
     public void markDone() {
-        isDone = true;
+        completedAt = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+    }
+
+    /** Marks this task as complete at the supplied local date-time. */
+    public void markDone(LocalDateTime completionTime) {
+        completedAt = completionTime.truncatedTo(ChronoUnit.MINUTES);
     }
 
     /** Marks this task as incomplete. */
     public void markUnDone() {
-        isDone = false;
+        completedAt = null;
+    }
+
+    /** Returns whether this task has been completed. */
+    public boolean isDone() {
+        return completedAt != null;
+    }
+
+    /** Returns the local date-time at which this task was last completed. */
+    public LocalDateTime getCompletedAt() {
+        return completedAt;
     }
 
     /**
      * Returns this task's details in the pipe-delimited save-file format:
-     * a {@code 1}/{@code 0} completion flag followed by the description,
-     * e.g., {@code 1 | read book}. Subclasses prepend their type letter
-     * and append any extra fields.
+     * its optional completion date-time followed by the description.
+     * Subclasses prepend their type letter and append any extra fields.
      */
     public String toSaveFormat() {
-        return (this.isDone ? DONE_FLAG : UNDONE_FLAG) + " | " + description;
+        String completionTimeText = completedAt == null ? "" : completedAt.toString();
+        return completionTimeText + " | " + description;
     }
 
     /**
      * Reconstructs a task from one of its save-file lines, e.g.,
-     * {@code D | 1 | return book | Sunday} becomes a completed Deadline.
+     * {@code D | 2026-09-06T18:15 | return book | 2026-09-08T18:00}
+     * becomes a completed Deadline.
      * Dispatches on the leading type letter to the matching subclass,
      * which validates and interprets its remaining fields.
      *
@@ -69,14 +86,19 @@ public class Task {
      * @throws StorageException when the line does not follow the save format
      */
     public static Task fromSaveFormat(String saveFormat) throws StorageException {
-        String[] fields = saveFormat.split(FIELD_SEPARATOR_REGEX);
+        String[] fields = saveFormat.split(FIELD_SEPARATOR_REGEX, -1);
         if (!hasValidBaseFields(fields)) {
             throw new CorruptFormatException(saveFormat);
         }
         try {
             Task task = createTask(fields, saveFormat);
-            if (fields[1].equals(DONE_FLAG)) {
-                task.markDone();
+            if (!fields[1].isEmpty()) {
+                LocalDateTime completionTime = LocalDateTime.parse(fields[1]);
+                if (completionTime.getSecond() != 0 || completionTime.getNano() != 0
+                        || !fields[1].equals(completionTime.toString())) {
+                    throw new IllegalArgumentException("A completion date-time must use minute precision.");
+                }
+                task.markDone(completionTime);
             }
             return task;
         } catch (IllegalArgumentException | DateTimeParseException e) {
@@ -86,13 +108,8 @@ public class Task {
 
     private static boolean hasValidBaseFields(String[] fields) {
         return fields.length >= 3
-                && !fields[1].isEmpty()
                 && !fields[2].isEmpty()
-                && isCompletionFlag(fields[1]);
-    }
-
-    private static boolean isCompletionFlag(String flag) {
-        return flag.equals(UNDONE_FLAG) || flag.equals(DONE_FLAG);
+                && !fields[0].isEmpty();
     }
 
     private static Task createTask(String[] fields, String saveFormat) throws CorruptFormatException {
@@ -111,6 +128,6 @@ public class Task {
      */
     @Override
     public String toString() {
-        return "[" + (this.isDone ? "X" : " ") + "] " + description;
+        return "[" + (isDone() ? "X" : " ") + "] " + description;
     }
 }

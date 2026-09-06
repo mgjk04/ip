@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.Test;
 
 import echo.exception.CorruptFormatException;
@@ -18,25 +20,26 @@ public class TaskTest {
 
     private static final String ISO_DATE = "2025-01-15T18:00";
     private static final String ISO_END = "2025-01-16T20:30";
+    private static final String ISO_COMPLETION = "2025-01-13T12:45";
 
     @Test
     public void fromSaveFormat_todoLine_returnsTodo() throws Exception {
-        Task task = Task.fromSaveFormat("T | 0 | read book");
+        Task task = Task.fromSaveFormat("T |  | read book");
         assertTrue(task instanceof Todo);
         assertEquals("[T][ ] read book", task.toString());
     }
 
     @Test
     public void fromSaveFormat_deadlineLine_returnsDeadline() throws Exception {
-        Task task = Task.fromSaveFormat("D | 0 | return book | " + ISO_DATE);
+        Task task = Task.fromSaveFormat("D | " + ISO_COMPLETION + " | return book | " + ISO_DATE);
         assertTrue(task instanceof Deadline);
-        assertEquals("[D][ ] return book (by: Jan 15 2025, 6:00 PM)", task.toString());
+        assertEquals("[D][X] return book (by: Jan 15 2025, 6:00 PM)", task.toString());
     }
 
     @Test
     public void fromSaveFormat_eventLine_returnsEvent() throws Exception {
         Task task = Task.fromSaveFormat(
-                "E | 0 | project meeting | " + ISO_DATE + " | " + ISO_END);
+                "E |  | project meeting | " + ISO_DATE + " | " + ISO_END);
         assertTrue(task instanceof Event);
         assertEquals("[E][ ] project meeting (from: Jan 15 2025, 6:00 PM"
                         + " to: Jan 16 2025, 8:30 PM)",
@@ -44,57 +47,64 @@ public class TaskTest {
     }
 
     @Test
-    public void fromSaveFormat_flagOne_marksTaskDone() throws Exception {
-        Task task = Task.fromSaveFormat("T | 1 | read book");
+    public void fromSaveFormat_completionTime_marksTaskDone() throws Exception {
+        Task task = Task.fromSaveFormat("T | " + ISO_COMPLETION + " | read book");
         assertEquals("[T][X] read book", task.toString());
+        assertEquals(LocalDateTime.parse(ISO_COMPLETION), task.getCompletedAt());
     }
 
     @Test
-    public void fromSaveFormat_flagZero_leavesTaskUndone() throws Exception {
-        Task task = Task.fromSaveFormat("T | 0 | read book");
-        assertFalse(task.toString().startsWith("[X]"));
+    public void fromSaveFormat_blankCompletionTime_leavesTaskUndone() throws Exception {
+        Task task = Task.fromSaveFormat("T |  | read book");
+        assertFalse(task.isDone());
     }
 
     @Test
-    public void toSaveFormat_undoneTask_flagsZero() {
-        assertEquals("0 | borrow book", new Task("borrow book").toSaveFormat());
+    public void toSaveFormat_undoneTask_hasBlankCompletionTime() {
+        assertEquals(" | borrow book", new Task("borrow book").toSaveFormat());
     }
 
     @Test
-    public void toSaveFormat_doneTask_flagsOne() {
+    public void toSaveFormat_doneTask_writesMinutePrecisionCompletionTime() {
         Task task = new Task("borrow book");
-        task.markDone();
-        assertEquals("1 | borrow book", task.toSaveFormat());
+        task.markDone(LocalDateTime.of(2025, 1, 13, 12, 45, 30, 999));
+        assertEquals("2025-01-13T12:45 | borrow book", task.toSaveFormat());
     }
 
     @Test
     public void fromSaveFormat_unknownTypeLetter_exceptionThrown() {
-        assertThrows(CorruptFormatException.class, () -> Task.fromSaveFormat("X | 0 | mystery"));
+        assertThrows(CorruptFormatException.class, () -> Task.fromSaveFormat("X |  | mystery"));
     }
 
     @Test
     public void fromSaveFormat_tooFewFields_exceptionThrown() {
-        assertThrows(CorruptFormatException.class, () -> Task.fromSaveFormat("T | 0"));
+        assertThrows(CorruptFormatException.class, () -> Task.fromSaveFormat("T | "));
     }
 
     @Test
-    public void fromSaveFormat_completionFlagNotZeroOrOne_exceptionThrown() {
-        assertThrows(CorruptFormatException.class, () -> Task.fromSaveFormat("T | 2 | read book"));
+    public void fromSaveFormat_legacyCompletionFlag_exceptionThrown() {
+        assertThrows(CorruptFormatException.class, () -> Task.fromSaveFormat("T | 0 | read book"));
     }
 
     @Test
     public void fromSaveFormat_emptyDescription_exceptionThrown() {
-        assertThrows(CorruptFormatException.class, () -> Task.fromSaveFormat("D | 0 |  | " + ISO_DATE));
+        assertThrows(CorruptFormatException.class, () -> Task.fromSaveFormat("D |  |  | " + ISO_DATE));
     }
 
     @Test
     public void fromSaveFormat_invalidDeadlineDate_exceptionThrown() {
-        assertThrows(CorruptFormatException.class, () -> Task.fromSaveFormat("D | 0 | return book | not-a-date"));
+        assertThrows(CorruptFormatException.class, () -> Task.fromSaveFormat("D |  | return book | not-a-date"));
     }
 
     @Test
     public void fromSaveFormat_invalidEventDate_exceptionThrown() {
         assertThrows(CorruptFormatException.class, () -> Task.fromSaveFormat(
-                        "E | 0 | meeting | " + ISO_DATE + " | nope"));
+                        "E |  | meeting | " + ISO_DATE + " | nope"));
+    }
+
+    @Test
+    public void fromSaveFormat_secondPrecisionCompletionTime_exceptionThrown() {
+        assertThrows(CorruptFormatException.class, () -> Task.fromSaveFormat(
+                "T | 2025-01-13T12:45:01 | read book"));
     }
 }
