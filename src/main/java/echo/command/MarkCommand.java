@@ -5,6 +5,7 @@ import echo.storage.Storage;
 import echo.task.Task;
 import echo.task.TaskList;
 import echo.ui.Ui;
+//Codex assistance
 
 /**
  * Updates the completion status of the task at a zero-based index.
@@ -28,6 +29,7 @@ public class MarkCommand extends Command {
 
     /**
      * Updates the task's status, saves the list, and confirms the change.
+     * See: {@link Command#execute(TaskList, Ui, Storage)}
      */
     @Override
     public String execute(TaskList taskList, Ui ui, Storage storage) throws EchoException {

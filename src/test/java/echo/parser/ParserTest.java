@@ -14,12 +14,14 @@ import echo.command.ExitCommand;
 import echo.command.FindCommand;
 import echo.command.ListCommand;
 import echo.command.MarkCommand;
+import echo.command.StatsCommand;
 import echo.exception.DeadlineFormatException;
 import echo.exception.DeleteFormatException;
 import echo.exception.EchoException;
 import echo.exception.EventFormatException;
 import echo.exception.FindFormatException;
 import echo.exception.InvalidTaskNumberException;
+import echo.exception.StatsFormatException;
 import echo.exception.TodoFormatException;
 import echo.exception.UnknownCommandException;
 import echo.storage.Storage;
@@ -71,6 +73,16 @@ public class ParserTest {
     @Test
     public void parse_findWhitespaceOnlyKeyword_exceptionThrown() {
         assertThrows(FindFormatException.class, () -> new Parser().parse("find   "));
+    }
+
+    @Test
+    public void parse_statsWithoutArguments_returnsStatsCommand() throws EchoException {
+        assertTrue(new Parser().parse("stats") instanceof StatsCommand);
+    }
+
+    @Test
+    public void parse_statsWithArguments_exceptionThrown() {
+        assertThrows(StatsFormatException.class, () -> new Parser().parse("stats today"));
     }
 
     @Test

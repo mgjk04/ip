@@ -33,7 +33,7 @@ public class Todo extends Task {
 
     /**
      * Reconstructs a {@code todo} from its save-format fields (type letter,
-     * completion flag, description).
+     * completion date-time, description).
      *
      * @param fields the split save-file line for this {@code todo}.
      * @return the reconstructed {@code todo}.

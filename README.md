@@ -23,6 +23,7 @@ Prerequisites: JDK 25, update Intellij to the most recent version.
    ```
 
 **Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
+
 ## Image Credit
 * DaEcho.png: https://picryl.com/media/cat-annoyed-mauzen-animals-717af2
 * DaUser.png: https://www.pickpik.com/cat-animal-pet-closeup-macro-feline-8058
@@ -35,7 +36,7 @@ Prerequisites: JDK 25, update Intellij to the most recent version.
 * test-ui skill from ip Level-4 AI guidance section
 * Code generation as directed by ip instructions under "AI Guidance" sections. Such code will be annotated with comments.
 ### OpenCode:
-Started to use OpenCode after Codex usage ran out.
+~~Started to use OpenCode after Codex usage ran out.~~
 * Suggestions on code improvements.
 * Performing repetitive / manual tasks (e.g. ASCII banner generation).
 * Code generation as guided by ip instructions under "AI Guidance" sections. Such code will be annotated with comments.

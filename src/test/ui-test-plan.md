@@ -10,19 +10,19 @@ Deadline and event times are entered as `yyyy-MM-dd HHmm`, e.g. `2019-12-02 1800
 
 ## Side effects: automatic saving and startup loading
 
-Every successful `todo`, `deadline`, `event`, `mark`, `unmark`, or `delete` command silently rewrites `./data/echo.txt`, relative to the working directory. The file stores one pipe-delimited line per task: type letter (`T`/`D`/`E`), completion flag (`1` = done / `0` = not done), description, then the deadline's due date or the event's start and end times, each written as ISO-8601 text (`yyyy-MM-ddTHH:mm`). Running the "add and list all task types" case from a clean state must leave:
+Every successful `todo`, `deadline`, `event`, `mark`, `unmark`, or `delete` command silently rewrites `./data/echo.txt`, relative to the working directory. The file stores one pipe-delimited line per task: type letter (`T`/`D`/`E`), an optional completion date-time (blank when incomplete), description, then the deadline's due date or the event's start and end times. Dates are written as ISO-8601 text (`yyyy-MM-ddTHH:mm`). Running the "add and list all task types" case from a clean state must leave:
 
 ```text
-T | 0 | borrow book
-D | 0 | return book | 2019-12-02T18:00
-E | 0 | project meeting | 2019-12-02T14:00 | 2019-12-02T16:00
+T |  | borrow book
+D |  | return book | 2019-12-02T18:00
+E |  | project meeting | 2019-12-02T14:00 | 2019-12-02T16:00
 ```
 
-On startup Echo reads `../../data/echo.txt` (if present) and restores those tasks before greeting; a missing file starts an empty list, and a malformed line reports a storage error instead of aborting (see the last two cases). Task details must not contain `|` because it separates saved fields; inputs that do are rejected outright (see the "pipe characters are rejected" case). To verify persistence manually from a known state:
+On startup Echo reads `../../data/echo.txt` (if present) and restores those tasks before greeting; a missing file starts an empty list, and a malformed line reports a storage error instead of aborting (see the last two cases). Task details must not contain `|` because it separates saved fields; inputs that do are rejected outright (see the "pipe characters are rejected" case). The previous `T | 0 | description` completion-flag format is not supported. To verify persistence manually from a known state:
 
 1. Delete `../../data/echo.txt`, run one session that adds `todo borrow book`, then quit with `bye`.
 2. Start a new session entering `list`: `[T][ ] borrow book` must appear.
-3. Re-running the same session after `mark 1` must show `[T][X] borrow book`.
+3. Re-running the same session after `mark 1` must show `[T][X] borrow book`; its save line has a nonblank completion date-time.
 
 Successful saves and loads produce no console output, so the expected transcripts below do not change.
 ## Test case: greeting and graceful exit
@@ -327,6 +327,63 @@ OOPS!!! Invalid delete command. Format: delete <taskNumber>
 Bye!
 ```
 
+## Test case: show statistics and reject arguments
+
+- **Aim:** Verify that `stats` reports global and current-week completion counts without changing tasks, and rejects any arguments.
+- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes/java/main echo.Echo`
+- **Inputs:**
+```text
+todo read book
+deadline return book /by 2019-12-02 1800
+event project meeting /from 2019-12-02 1400 /to 2019-12-02 1600
+mark 1
+mark 2
+stats
+stats today
+bye
+```
+- **Expected output:**
+```text
+ _____     _           
+| ____|___| |__   ___  
+|  _| / __| '_ \ / _ \ 
+| |__| (__| | | | (_) |
+|_____\___|_| |_|\___/ 
+
+Hello! I'm Echo.
+How can I help?
+Got it. I've added this task:
+[T][ ] read book
+Now you have 1 tasks in the list.
+Got it. I've added this task:
+[D][ ] return book (by: Dec 02 2019, 6:00 PM)
+Now you have 2 tasks in the list.
+Got it. I've added this task:
+[E][ ] project meeting (from: Dec 02 2019, 2:00 PM to: Dec 02 2019, 4:00 PM)
+Now you have 3 tasks in the list.
+Nice! I've marked this task as done:
+[T][X] read book
+Nice! I've marked this task as done:
+[D][X] return book (by: Dec 02 2019, 6:00 PM)
+Statistics:
+
+Global:
+Total Tasks: 3
+Total Completed: 2
+Total Incomplete: 1
+Todos Completed: 1
+Events Completed: 0
+Deadlines Completed: 1
+
+Week:
+Completed: 2
+Todos Completed: 1
+Events Completed: 0
+Deadlines Completed: 1
+OOPS!!! Invalid stats command. Format: stats
+Bye!
+```
+
 ## Test case: pipe characters are rejected
 
 - **Aim:** Verify that task details containing the reserved save-file separator '|' are rejected for every task type and leave the list unchanged.
@@ -392,7 +449,7 @@ Bye!
 ## Test case: corrupted save lines report storage errors on load
 
 - **Aim:** Verify that a saved line containing an unparsable date is reported at startup as a storage error instead of crashing, after which the session continues with the remaining valid tasks discarded.
-- **Command:** `(if exist data rmdir /s /q data) & mkdir data & (echo T ^| 0 ^| read book>data\echo.txt) & (echo D ^| 1 ^| return book ^| Sunday>>data\echo.txt) & java -cp build/classes/java/main echo.Echo`
+- **Command:** `(if exist data rmdir /s /q data) & mkdir data & (echo T ^|  ^| read book>data\echo.txt) & (echo D ^| Sunday ^| return book ^| 2019-12-02T18:00>>data\echo.txt) & java -cp build/classes/java/main echo.Echo`
 - **Inputs:**
 ```text
 list

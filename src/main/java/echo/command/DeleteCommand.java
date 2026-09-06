@@ -5,6 +5,7 @@ import echo.storage.Storage;
 import echo.task.Task;
 import echo.task.TaskList;
 import echo.ui.Ui;
+//Codex assistance
 
 /**
  * Removes one task from the list by its zero-based index.
@@ -14,7 +15,7 @@ public class DeleteCommand extends Command {
 
     /**
      * Creates a command that deletes one task.
-     *
+     * See: {@link Command#execute(TaskList, Ui, Storage)}
      * @param index zero-based index of the task to remove
      */
     public DeleteCommand(int index) {
