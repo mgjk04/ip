@@ -1,4 +1,5 @@
 package echo.task;
+
 import java.time.LocalDateTime;
 
 import echo.utils.DateTimeUtility;
@@ -8,6 +9,7 @@ import echo.utils.DateTimeUtility;
  * Represents a task that starts and ends at specific date-times.
  */
 public class Event extends Task {
+    private static final TaskType TYPE = TaskType.EVENT;
     private final LocalDateTime from;
     private final LocalDateTime to;
 
@@ -30,8 +32,8 @@ public class Event extends Task {
      */
     @Override
     public String toString() {
-        return "[E]" + super.toString() + " (from: " + this.from.format(DateTimeUtility.DISPLAY)
-                + " to: " + this.to.format(DateTimeUtility.DISPLAY) + ")";
+        return "[" + TYPE.toString() + "]" + super.toString() + " (from: " + this.from.format(DateTimeUtility.DISPLAY_FORMAT)
+                + " to: " + this.to.format(DateTimeUtility.DISPLAY_FORMAT) + ")";
     }
 
     /**
@@ -40,7 +42,7 @@ public class Event extends Task {
      */
     @Override
     public String toSaveFormat() {
-        return "E | " + super.toSaveFormat() + " | " + this.from + " | " + this.to;
+        return TYPE.toString() + " | " + super.toSaveFormat() + " | " + this.from + " | " + this.to;
     }
 
     /**
@@ -55,5 +57,10 @@ public class Event extends Task {
             throw new IllegalArgumentException("A saved event must have exactly 5 non-empty fields.");
         }
         return new Event(fields[2], LocalDateTime.parse(fields[3]), LocalDateTime.parse(fields[4]));
+    }
+
+    @Override
+    public TaskType getTaskType() {
+        return TYPE;
     }
 }

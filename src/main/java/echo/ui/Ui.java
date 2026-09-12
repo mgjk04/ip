@@ -33,25 +33,24 @@ public class Ui {
                 + "|  _| / __| '_ \\ / _ \\ \n"
                 + "| |__| (__| | | | (_) |\n"
                 + "|_____\\___|_| |_|\\___/ \n";
-        String salutation = "Hello! I'm " + name + ".\n"
+        String greeting = "Hello! I'm " + name + ".\n"
                 + "How can I help?";
-        return echo(banner + "\n" + salutation);
+        return joinLines(banner + "\n" + greeting);
     }
 
     /**
-     * Sends the valediction message.
+     * Sends the farewell message.
      */
     public String farewell() {
-        String valediction = "Bye!";
-        return echo(valediction);
+        String message = "Bye!";
+        return joinLines(message);
     }
 
     /**
-     * Sends the input messages wrapped by separator defined in {@link Ui#Ui(String, String)}
-     * or the default separator in the case the no-arg constructor {@link Ui#Ui()} is called.
+     * Sends the input messages joined as a single string
      * @param lines lines of messages to be wrapped by the separator.
      */
-    public String echo(String ... lines) {
+    public String joinLines(String... lines) {
         return String.join("\n", lines);
     }
 
@@ -60,7 +59,7 @@ public class Ui {
      * @param e {@link EchoException} which error message to display
      */
     public String showError(EchoException e) {
-        return echo(e.getMessage());
+        return joinLines(e.getMessage());
     }
 
 }

@@ -9,6 +9,7 @@ import echo.utils.DateTimeUtility;
  * Represents a task that needs to be done before a specific date-time.
  */
 public class Deadline extends Task {
+    public static final TaskType TYPE = TaskType.DEADLINE;
     private final LocalDateTime by;
 
     /**
@@ -28,7 +29,7 @@ public class Deadline extends Task {
      */
     @Override
     public String toString() {
-        return "[D]" + super.toString() + " (by: " + by.format(DateTimeUtility.DISPLAY) + ")";
+        return "[" + TYPE.toString() + "]" + super.toString() + " (by: " + by.format(DateTimeUtility.DISPLAY_FORMAT) + ")";
     }
 
 
@@ -38,7 +39,7 @@ public class Deadline extends Task {
      */
     @Override
     public String toSaveFormat() {
-        return "D | " + super.toSaveFormat() + " | " + by;
+        return TYPE.toString() + " | " + super.toSaveFormat() + " | " + by;
     }
 
     /**
@@ -53,6 +54,11 @@ public class Deadline extends Task {
             throw new IllegalArgumentException("A saved deadline must have exactly 4 non-empty fields.");
         }
         return new Deadline(fields[2], LocalDateTime.parse(fields[3]));
+    }
+
+    @Override
+    public TaskType getTaskType() {
+        return TYPE;
     }
 }
 

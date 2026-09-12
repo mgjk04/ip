@@ -27,6 +27,11 @@ public class TaskListTest {
         public TaskStub(String description) {
             super(description);
         }
+
+        @Override
+        public TaskType getTaskType() {
+            return null;
+        }
     }
 
     @Test
