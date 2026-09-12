@@ -99,7 +99,7 @@ public class TaskListTest {
     }
 
     @Test
-    public void asListText_multipleTasks_numberedInInsertionOrder() {
+    public void formatAsListText_multipleTasks_numberedInInsertionOrder() {
         TaskList tasks = new TaskList();
         tasks.add(new TaskStub("alpha"));
         tasks.add(new TaskStub("beta"));
@@ -107,7 +107,7 @@ public class TaskListTest {
         String expected = "Here are the tasks in your list:\n"
                 + "1.[ ] alpha\n"
                 + "2.[ ] beta";
-        assertEquals(expected, tasks.asListText());
+        assertEquals(expected, tasks.listAsText());
     }
 
     @Test
@@ -179,23 +179,23 @@ public class TaskListTest {
     }
 
     @Test
-    public void asListText_emptyList_returnsHeaderWithTrailingNewline() {
+    public void formatAsListText_emptyList_returnsHeaderWithTrailingNewline() {
         // Header ends with '\n'; entry separators go only between entries,
         // so an empty list keeps the header's own trailing newline.
         TaskList tasks = new TaskList();
 
-        assertEquals("Here are the tasks in your list:\n", tasks.asListText());
+        assertEquals("Here are the tasks in your list:\n", tasks.listAsText());
     }
 
     @Test
-    public void asListText_doneTask_showsDoneMarker() {
+    public void formatAsListText_doneTask_showsDoneMarker() {
         TaskList tasks = new TaskList();
         Task done = new TaskStub("finished");
         done.markDone();
         tasks.add(done);
 
         assertEquals("Here are the tasks in your list:\n1.[X] finished",
-                tasks.asListText());
+                tasks.listAsText());
     }
 
     @Test

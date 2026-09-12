@@ -104,15 +104,15 @@ public class TaskList {
      *
      * @return multi-line text of all tasks prefixed with one-based numbers
      */
-    public String asListText() {
-        StringBuilder listTxt = new StringBuilder("Here are the tasks in your list:\n");
+    public String listAsText() {
+        StringBuilder listText = new StringBuilder("Here are the tasks in your list:\n");
         for (int i = 0; i < tasks.size(); i++) {
             if (i > 0) {
-                listTxt.append("\n");
+                listText.append("\n");
             }
-            appendNumberedTask(listTxt, i);
+            appendNumberedTask(listText, i);
         }
-        return listTxt.toString();
+        return listText.toString();
     }
 
     /**
