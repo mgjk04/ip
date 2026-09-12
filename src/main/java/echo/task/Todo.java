@@ -4,6 +4,7 @@ package echo.task;
  * Represents a task without any date attached to it.
  */
 public class Todo extends Task {
+    private static final TaskType TYPE = TaskType.TODO;
     /**
      * Creates an incomplete {@code todo} with the given description.
      *
@@ -19,7 +20,7 @@ public class Todo extends Task {
      */
     @Override
     public String toString() {
-        return "[T]" + super.toString();
+        return "[" + TYPE.toString() + "]" + super.toString();
     }
 
     /**
@@ -28,7 +29,7 @@ public class Todo extends Task {
      */
     @Override
     public String toSaveFormat() {
-        return "T | " + super.toSaveFormat();
+        return TYPE.toString() + " | " + super.toSaveFormat();
     }
 
     /**
@@ -43,5 +44,10 @@ public class Todo extends Task {
             throw new IllegalArgumentException("A saved todo must have exactly 3 fields.");
         }
         return new Todo(fields[2]);
+    }
+
+    @Override
+    public TaskType getTaskType() {
+        return TYPE;
     }
 }

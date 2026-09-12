@@ -1,5 +1,6 @@
 package echo.utils;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
@@ -11,11 +12,24 @@ import java.util.Locale;
  */
 public class DateTimeUtility {
     /** Accepts user-supplied dates, e.g. {@code 2019-12-02 1800}. */
-    public static final DateTimeFormatter INPUT =
+    public static final DateTimeFormatter INPUT_FORMAT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
 
     /** Renders dates for display, e.g. {@code Dec 02 2019, 6:00 PM}. */
-    public static final DateTimeFormatter DISPLAY = DateTimeFormatter
+    public static final DateTimeFormatter DISPLAY_FORMAT = DateTimeFormatter
             .ofPattern("MMM dd yyyy, h:mm a")
             .withLocale(Locale.ENGLISH);
+
+    /**
+     * Evaluates if the targetTime is within this past week
+     * and not in the future.
+     * @param targetTime Time to be evaluated
+     * @param weekStart Start of the week
+     * @param currentTime The current time
+     * @return Whether the target time is completed within the past week
+     */
+    public static boolean isWithinThisWeek(LocalDateTime targetTime, LocalDateTime weekStart,
+                                        LocalDateTime currentTime) {
+        return !targetTime.isBefore(weekStart) && !targetTime.isAfter(currentTime);
+    }
 }

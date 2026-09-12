@@ -7,17 +7,12 @@ import java.time.temporal.ChronoUnit;
 import echo.exception.CorruptFormatException;
 import echo.exception.StorageException;
 
-
 /**
  * Represents a task description and whether the task has been completed.
  * Class with Codex contribution.
  */
-public class Task {
+public abstract class Task {
     private static final String FIELD_SEPARATOR_REGEX = " \\| ";
-    private static final String TODO_TYPE = "T";
-    private static final String DEADLINE_TYPE = "D";
-    private static final String EVENT_TYPE = "E";
-
     private final String description;
     private LocalDateTime completedAt;
 
@@ -50,7 +45,7 @@ public class Task {
     }
 
     /** Marks this task as incomplete. */
-    public void markUnDone() {
+    public void markNotDone() {
         completedAt = null;
     }
 
@@ -113,13 +108,20 @@ public class Task {
     }
 
     private static Task createTask(String[] fields, String saveFormat) throws CorruptFormatException {
-        return switch (fields[0]) {
-            case TODO_TYPE -> Todo.fromSaveFormat(fields);
-            case DEADLINE_TYPE -> Deadline.fromSaveFormat(fields);
-            case EVENT_TYPE -> Event.fromSaveFormat(fields);
+        TaskType type = TaskType.fromString(fields[0]);
+        return switch (type) {
+            case TODO -> Todo.fromSaveFormat(fields);
+            case DEADLINE -> Deadline.fromSaveFormat(fields);
+            case EVENT -> Event.fromSaveFormat(fields);
             default -> throw new CorruptFormatException(saveFormat);
         };
     }
+
+    /**
+     * Returns the {@link TaskType} of the task
+     * @return {@link TaskType} of the task
+     */
+    public abstract TaskType getTaskType();
 
     /**
      * Creates String representation of a task.

@@ -61,14 +61,14 @@ public class TaskTest {
 
     @Test
     public void toSaveFormat_undoneTask_hasBlankCompletionTime() {
-        assertEquals(" | borrow book", new Task("borrow book").toSaveFormat());
+        assertEquals("T |  | borrow book", new Todo("borrow book").toSaveFormat());
     }
 
     @Test
     public void toSaveFormat_doneTask_writesMinutePrecisionCompletionTime() {
-        Task task = new Task("borrow book");
+        Task task = new Todo("borrow book");
         task.markDone(LocalDateTime.of(2025, 1, 13, 12, 45, 30, 999));
-        assertEquals("2025-01-13T12:45 | borrow book", task.toSaveFormat());
+        assertEquals("T | 2025-01-13T12:45 | borrow book", task.toSaveFormat());
     }
 
     @Test

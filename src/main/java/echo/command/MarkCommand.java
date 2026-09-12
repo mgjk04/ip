@@ -14,7 +14,7 @@ import echo.ui.Ui;
  */
 public class MarkCommand extends Command {
     private final int index;
-    private final boolean done;
+    private final boolean isDone;
 
     /**
      * Creates a command that updates one task's completion status.
@@ -24,7 +24,7 @@ public class MarkCommand extends Command {
      */
     public MarkCommand(int index, boolean done) {
         this.index = index;
-        this.done = done;
+        this.isDone = done;
     }
 
     /**
@@ -35,12 +35,12 @@ public class MarkCommand extends Command {
     public String execute(TaskList taskList, Ui ui, Storage storage) throws EchoException {
         Task task = taskList.getTask(index);
         String response = "";
-        if (done) {
+        if (this.isDone) {
             task.markDone();
-            response = ui.echo("Nice! I've marked this task as done:", task.toString());
+            response = ui.joinLines("Nice! I've marked this task as done:", task.toString());
         } else {
-            task.markUnDone();
-            response = ui.echo("OK, I've marked this task as not done yet:", task.toString());
+            task.markNotDone();
+            response = ui.joinLines("OK, I've marked this task as not done yet:", task.toString());
         }
         storage.save(taskList.getAll());
         return response;

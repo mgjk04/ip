@@ -1,4 +1,5 @@
 package echo.parser;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
@@ -168,7 +169,7 @@ public class Parser {
     private LocalDateTime parseDateTime(String dateTimeText, EchoException invalidFormatError)
             throws EchoException {
         try {
-            return LocalDateTime.parse(dateTimeText, DateTimeUtility.INPUT);
+            return LocalDateTime.parse(dateTimeText, DateTimeUtility.INPUT_FORMAT);
         } catch (DateTimeParseException exception) {
             throw invalidFormatError;
         }
