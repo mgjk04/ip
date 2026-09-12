@@ -19,6 +19,6 @@ public class StatsCommand extends Command {
     @Override
     public String execute(TaskList taskList, Ui ui, Storage storage) {
         LocalDateTime currentTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
-        return ui.echo(taskList.statisticsText(currentTime));
+        return ui.joinLines(taskList.getStatistics(currentTime));
     }
 }

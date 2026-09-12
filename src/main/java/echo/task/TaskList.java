@@ -1,8 +1,6 @@
 package echo.task;
 
-import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -10,6 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import echo.exception.InvalidTaskNumberException;
+import echo.stats.TaskStats;
 import echo.storage.Storage;
 
 
@@ -139,62 +138,8 @@ public class TaskList {
      * @param currentTime local date-time at which the statistics are requested
      * @return formatted statistics text
      */
-    public String statisticsText(LocalDateTime currentTime) {
-        LocalDateTime weekStart = currentTime.toLocalDate()
-                .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-                .atStartOfDay();
-        int totalCompleted = 0;
-        int todoCompleted = 0;
-        int deadlineCompleted = 0;
-        int eventCompleted = 0;
-        int weekCompleted = 0;
-        int weekTodoCompleted = 0;
-        int weekDeadlineCompleted = 0;
-        int weekEventCompleted = 0;
-
-        for (Task task : tasks) {
-            if (!task.isDone()) {
-                continue;
-            }
-            totalCompleted++;
-            if (task instanceof Todo) {
-                todoCompleted++;
-            } else if (task instanceof Deadline) {
-                deadlineCompleted++;
-            } else if (task instanceof Event) {
-                eventCompleted++;
-            }
-
-            if (isCompletedThisWeek(task.getCompletedAt(), weekStart, currentTime)) {
-                weekCompleted++;
-                if (task instanceof Todo) {
-                    weekTodoCompleted++;
-                } else if (task instanceof Deadline) {
-                    weekDeadlineCompleted++;
-                } else if (task instanceof Event) {
-                    weekEventCompleted++;
-                }
-            }
-        }
-
-        return "Statistics:\n\n"
-                + "Global:\n"
-                + "Total Tasks: " + tasks.size() + "\n"
-                + "Total Completed: " + totalCompleted + "\n"
-                + "Total Incomplete: " + (tasks.size() - totalCompleted) + "\n"
-                + "Todos Completed: " + todoCompleted + "\n"
-                + "Events Completed: " + eventCompleted + "\n"
-                + "Deadlines Completed: " + deadlineCompleted + "\n\n"
-                + "Week:\n"
-                + "Completed: " + weekCompleted + "\n"
-                + "Todos Completed: " + weekTodoCompleted + "\n"
-                + "Events Completed: " + weekEventCompleted + "\n"
-                + "Deadlines Completed: " + weekDeadlineCompleted;
-    }
-
-    private boolean isCompletedThisWeek(LocalDateTime completedAt, LocalDateTime weekStart,
-                                        LocalDateTime currentTime) {
-        return !completedAt.isBefore(weekStart) && !completedAt.isAfter(currentTime);
+    public String getStatistics(LocalDateTime currentTime) {
+        return TaskStats.getStatsAsString(tasks, currentTime);
     }
 
     private void appendNumberedTask(StringBuilder listTxt, int taskIndex) {

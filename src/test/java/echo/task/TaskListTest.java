@@ -232,7 +232,7 @@ public class TaskListTest {
     }
 
     @Test
-    public void statisticsText_mixedTasks_returnsGlobalAndWeeklyCounts() {
+    public void getStatistics_mixedTasks_returnsGlobalAndWeeklyCounts() {
         TaskList tasks = new TaskList();
         Todo completedTodo = new Todo("read book");
         completedTodo.markDone(LocalDateTime.of(2026, 9, 7, 9, 30));
@@ -260,11 +260,11 @@ public class TaskListTest {
                 + "Events Completed: 1\n"
                 + "Deadlines Completed: 0";
 
-        assertEquals(expected, tasks.statisticsText(LocalDateTime.of(2026, 9, 7, 12, 0)));
+        assertEquals(expected, tasks.getStatistics(LocalDateTime.of(2026, 9, 7, 12, 0)));
     }
 
     @Test
-    public void statisticsText_completionAtMondayStart_countsInCurrentWeek() {
+    public void getStatistics_completionAtMondayStart_countsInCurrentWeek() {
         TaskList tasks = new TaskList();
         Todo boundaryTask = new Todo("at boundary");
         boundaryTask.markDone(LocalDateTime.of(2026, 9, 7, 0, 0));
@@ -273,7 +273,7 @@ public class TaskListTest {
         tasks.add(boundaryTask);
         tasks.add(earlierTask);
 
-        assertTrue(tasks.statisticsText(LocalDateTime.of(2026, 9, 7, 0, 0))
+        assertTrue(tasks.getStatistics(LocalDateTime.of(2026, 9, 7, 0, 0))
                 .contains("Completed: 1\nTodos Completed: 1"));
     }
 }
