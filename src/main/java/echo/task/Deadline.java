@@ -29,7 +29,8 @@ public class Deadline extends Task {
      */
     @Override
     public String toString() {
-        return "[" + TYPE.toString() + "]" + super.toString() + " (by: " + by.format(DateTimeUtility.DISPLAY_FORMAT) + ")";
+        return "[" + TYPE.toString() + "]" + super.toString()
+                + " (by: " + by.format(DateTimeUtility.DISPLAY_FORMAT) + ")";
     }
 
 

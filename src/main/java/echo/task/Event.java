@@ -32,7 +32,8 @@ public class Event extends Task {
      */
     @Override
     public String toString() {
-        return "[" + TYPE.toString() + "]" + super.toString() + " (from: " + this.from.format(DateTimeUtility.DISPLAY_FORMAT)
+        return "[" + TYPE.toString() + "]" + super.toString()
+                + " (from: " + this.from.format(DateTimeUtility.DISPLAY_FORMAT)
                 + " to: " + this.to.format(DateTimeUtility.DISPLAY_FORMAT) + ")";
     }
 
