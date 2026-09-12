@@ -33,8 +33,8 @@ public class MainWindow extends AnchorPane {
     }
 
     /** Injects the Echo instance and shows the greeting once it is set. */
-    public void setEcho(Echo d) {
-        echo = d;
+    public void setEcho(Echo e) {
+        echo = e;
         dialogContainer.getChildren().add(DialogBox.getEchoDialog(echo.start(), echoImage));
     }
 

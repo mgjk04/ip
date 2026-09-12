@@ -10,7 +10,6 @@ import echo.storage.Storage;
 import echo.task.TaskList;
 import echo.ui.Ui;
 
-
 /**
  * Entry point of the Echo chatbot application. Wires together the task list,
  * UI, parser, and storage components, then runs the read-evaluate-print loop.
@@ -52,6 +51,10 @@ public class Echo {
         return ui.greet();
     }
 
+    /**
+     * Evaluates if the bye command has been issued and should terminate the program.
+     * @return Whether the bye command has been issued.
+     */
     public boolean isExit() {
         return prevCommand != null && prevCommand.isExit();
     }
@@ -63,9 +66,9 @@ public class Echo {
      */
     public String getResponse(String input) {
         try {
-            Command cmd = parser.parse(input);
-            prevCommand = cmd;
-            return cmd.execute(taskList, ui, storage);
+            Command command = parser.parse(input);
+            prevCommand = command;
+            return command.execute(taskList, ui, storage);
         } catch (EchoException exception) {
             return ui.showError(exception);
         }
