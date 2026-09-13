@@ -2,6 +2,17 @@
 
 Run these cases with `python .codex/skills/test-ui/scripts/run_ui_tests.py` from the repository root. Compile the program first with Java 25.
 
+## GUI smoke testing
+
+Use your computer use plugin to test the basic functionality of the chatbot GUI. Let me know if I need to
+enable/configure anything to help with that. Check startup, a valid command, an invalid command, Enter-to-send,
+the Send button, scrolling, and resizing. If native desktop control is unavailable, report that limitation and use
+the manual checklist instead of claiming that the GUI was tested through computer control.
+
+Manual checklist: confirm that messages wrap at minimum, default, and wide window sizes; errors use the coral
+presentation; blank input creates no messages; input focus returns after submission; avatars stay 52 px; and the
+conversation scrolls to the newest response.
+
 Because Echo restores saved tasks at startup, every case deletes the `data` directory before it starts, so cases are independent of execution order and leftovers.
 
 ## Dates and times (Level-8)

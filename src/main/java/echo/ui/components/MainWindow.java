@@ -1,6 +1,8 @@
 package echo.ui.components;
 
 import echo.Echo;
+import echo.ui.EchoResponse;
+import echo.ui.ResponseType;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -9,6 +11,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+
 /**
  * Controller for the main GUI.
  */
@@ -27,6 +30,7 @@ public class MainWindow extends AnchorPane {
     private Image userImage = new Image(this.getClass().getResourceAsStream("/images/DaUser.png"));
     private Image echoImage = new Image(this.getClass().getResourceAsStream("/images/DaEcho.png"));
 
+    /** Initializes automatic scrolling for the conversation. */
     @FXML
     public void initialize() {
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
@@ -35,7 +39,9 @@ public class MainWindow extends AnchorPane {
     /** Injects the Echo instance and shows the greeting once it is set. */
     public void setEcho(Echo e) {
         echo = e;
-        dialogContainer.getChildren().add(DialogBox.getEchoDialog(echo.start(), echoImage));
+        dialogContainer.getChildren().add(
+                DialogBox.getEchoDialog(echo.start(), echoImage, scrollPane.viewportBoundsProperty()));
+        Platform.runLater(userInput::requestFocus);
     }
 
     /**
@@ -45,12 +51,20 @@ public class MainWindow extends AnchorPane {
     @FXML
     private void handleUserInput() {
         String input = userInput.getText();
-        String response = echo.getResponse(input);
-        dialogContainer.getChildren().addAll(
-                DialogBox.getUserDialog(input, userImage),
-                DialogBox.getEchoDialog(response, echoImage)
-        );
+        if (input.isBlank()) {
+            userInput.requestFocus();
+            return;
+        }
+
+        EchoResponse response = echo.getTypedResponse(input);
+        DialogBox userDialog = DialogBox.getUserDialog(
+                input, userImage, scrollPane.viewportBoundsProperty());
+        DialogBox echoDialog = response.type() == ResponseType.ERROR
+                ? DialogBox.getErrorDialog(response.text(), echoImage, scrollPane.viewportBoundsProperty())
+                : DialogBox.getEchoDialog(response.text(), echoImage, scrollPane.viewportBoundsProperty());
+        dialogContainer.getChildren().addAll(userDialog, echoDialog);
         userInput.clear();
+        userInput.requestFocus();
         if (echo.isExit()) {
             Platform.exit();
         }
