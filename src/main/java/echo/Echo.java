@@ -8,6 +8,8 @@ import echo.exception.StorageException;
 import echo.parser.Parser;
 import echo.storage.Storage;
 import echo.task.TaskList;
+import echo.ui.EchoResponse;
+import echo.ui.ResponseType;
 import echo.ui.Ui;
 
 /**
@@ -65,12 +67,22 @@ public class Echo {
      * @return Echo's output
      */
     public String getResponse(String input) {
+        return getTypedResponse(input).text();
+    }
+
+    /**
+     * Processes user input and returns text with its GUI presentation type.
+     *
+     * @param input User input.
+     * @return Response text and presentation type.
+     */
+    public EchoResponse getTypedResponse(String input) {
         try {
             Command command = parser.parse(input);
             prevCommand = command;
-            return command.execute(taskList, ui, storage);
+            return new EchoResponse(command.execute(taskList, ui, storage), ResponseType.NORMAL);
         } catch (EchoException exception) {
-            return ui.showError(exception);
+            return new EchoResponse(ui.showError(exception), ResponseType.ERROR);
         }
     }
 }
