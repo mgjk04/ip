@@ -6,6 +6,6 @@ package echo.exception;
 public class StatsFormatException extends EchoException {
     /** Creates the error shown when a {@code stats} command has additional arguments */
     public StatsFormatException() {
-        super("Invalid stats command. Format: stats");
+        super("The stats command does not take extra details. Try: stats");
     }
 }

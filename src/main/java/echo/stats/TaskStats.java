@@ -18,19 +18,19 @@ public class TaskStats {
     private static final String TOTAL_KEY = "total";
     private static final String WEEKLY_KEY_SUFFIX = "-weekly";
     private static final String TASK_STATS_TEMPLATE =
-            "Statistics:\n\n"
-                    + "Global:\n"
-                    + "Total Tasks: %d\n"
-                    + "Total Completed: %d\n"
-                    + "Total Incomplete: %d\n"
-                    + "Todos Completed: %d\n"
-                    + "Events Completed: %d\n"
-                    + "Deadlines Completed: %d\n\n"
-                    + "Week:\n"
+            "Mission progress report:\n\n"
+                    + "All missions:\n"
+                    + "Total missions: %d\n"
                     + "Completed: %d\n"
-                    + "Todos Completed: %d\n"
-                    + "Events Completed: %d\n"
-                    + "Deadlines Completed: %d";
+                    + "Active: %d\n"
+                    + "Todos completed: %d\n"
+                    + "Events completed: %d\n"
+                    + "Deadlines completed: %d\n\n"
+                    + "This week:\n"
+                    + "Completed: %d\n"
+                    + "Todos completed: %d\n"
+                    + "Events completed: %d\n"
+                    + "Deadlines completed: %d";
 
     /**
      * Calculates the types of tasks and their statuses, along with weekly statistics

@@ -33,8 +33,8 @@ public class Ui {
                 + "|  _| / __| '_ \\ / _ \\ \n"
                 + "| |__| (__| | | | (_) |\n"
                 + "|_____\\___|_| |_|\\___/ \n";
-        String greeting = "Hello! I'm " + name + ".\n"
-                + "How can I help?";
+        String greeting = "Signal acquired. " + name + " here, your feline mission controller.\n"
+                + "What are we tackling today?";
         return joinLines(banner + "\n" + greeting);
     }
 
@@ -42,7 +42,7 @@ public class Ui {
      * Sends the farewell message.
      */
     public String farewell() {
-        String message = "Bye!";
+        String message = name + " going off-air. See you on the next mission!";
         return joinLines(message);
     }
 

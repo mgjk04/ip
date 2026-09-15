@@ -9,6 +9,6 @@ public class EchoException extends Exception {
      * @param message detail of what went wrong, shown to the user
      */
     public EchoException(String message) {
-        super("OOPS!!! " + message);
+        super("Signal scrambled.\n" + message);
     }
 }

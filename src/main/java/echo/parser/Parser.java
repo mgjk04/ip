@@ -207,7 +207,7 @@ public class Parser {
      */
     private void requireSavable(String detail) throws EchoException {
         if (detail.contains("|")) {
-            throw new EchoException("'|' cannot be used because it separates fields in the save file.");
+            throw new EchoException("The '|' character interferes with mission records, so it cannot be used.");
         }
     }
 }

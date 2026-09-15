@@ -55,7 +55,7 @@ public class Storage {
             Files.createDirectories(saveFile.getParent());
             Files.write(saveFile, lines);
         } catch (IOException e) {
-            throw new StorageException("I could not save your tasks to " + saveFile + ".");
+            throw new StorageException("I could not save your missions to " + saveFile + ".");
         }
     }
 
@@ -84,7 +84,7 @@ public class Storage {
             }
             return tasks;
         } catch (IOException e) {
-            throw new StorageException("I could not read your tasks at " + saveFile + ".");
+            throw new StorageException("I could not read your missions at " + saveFile + ".");
         }
     }
 }

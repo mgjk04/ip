@@ -9,6 +9,6 @@ public class CorruptFormatException extends StorageException {
      * @param saveFormat the offending improperly formatted saved format.
      */
     public CorruptFormatException(String saveFormat) {
-        super("Save file is corrupted. I could not understand this line: " + saveFormat);
+        super("I could not understand this record: " + saveFormat);
     }
 }

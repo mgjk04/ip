@@ -6,6 +6,7 @@ package echo.exception;
 public class UnknownCommandException extends EchoException {
     /** Creates the error shown when the input command is unrecognized. */
     public UnknownCommandException() {
-        super("Unknown command. I'm sorry, but I don't know what that means :(");
+        super("I don't recognise that transmission. "
+                + "Try todo, deadline, event, list, find, mark, unmark, delete, stats, or bye.");
     }
 }

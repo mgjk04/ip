@@ -9,6 +9,6 @@ public class DeleteFormatException extends EchoException {
      * Creates the error shown when a delete command lacks a valid task number.
      * Shows the correct delete command format.*/
     public DeleteFormatException() {
-        super("Invalid delete command. Format: delete <taskNumber>");
+        super("I need a mission number. Try: delete <taskNumber>");
     }
 }

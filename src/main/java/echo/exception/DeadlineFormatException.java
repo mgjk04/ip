@@ -9,7 +9,8 @@ public class DeadlineFormatException extends EchoException {
      * Creates a {@link DeadlineFormatException}.
      */
     public DeadlineFormatException() {
-        super("Invalid deadline command or date. Format: deadline <description> /by <yyyy-MM-dd HHmm>, e.g., deadline "
-                + "return book /by 2019-12-02 1800");
+        super("I need a description and valid deadline. "
+                + "Try: deadline <description> /by <yyyy-MM-dd HHmm>\n"
+                + "Example: deadline return book /by 2019-12-02 1800");
     }
 }
