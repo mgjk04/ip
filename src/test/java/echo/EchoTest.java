@@ -36,7 +36,7 @@ public class EchoTest {
         EchoResponse response = echo.getTypedResponse("unknown-command");
 
         assertEquals(ResponseType.ERROR, response.type());
-        assertTrue(response.text().startsWith("OOPS!!!"));
+        assertTrue(response.text().startsWith("Signal scrambled."));
     }
 
     @Test
