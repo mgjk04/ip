@@ -4,14 +4,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import echo.exception.InvalidTaskNumberException;
 import echo.stats.TaskStats;
 import echo.storage.Storage;
-
-
 
 /**
  * Owns the collection of {@link Task} objects and provides operations on it,
@@ -104,7 +101,11 @@ public class TaskList {
      * @return multi-line text of all tasks prefixed with one-based numbers
      */
     public String listAsText() {
-        StringBuilder listText = new StringBuilder("Here are the tasks in your list:\n");
+        if (tasks.isEmpty()) {
+            return "The mission manifest is clear.";
+        }
+
+        StringBuilder listText = new StringBuilder("Current mission manifest:\n");
         for (int i = 0; i < tasks.size(); i++) {
             if (i > 0) {
                 listText.append("\n");
@@ -125,11 +126,15 @@ public class TaskList {
      *         full-list numbers; header only when nothing matches
      */
     public String searchListText(String searchText) {
-        return "Here are the matching tasks in your list:\n"
-                + IntStream.range(0, tasks.size())
+        List<String> matchingTasks = IntStream.range(0, tasks.size())
                 .filter(index -> tasks.get(index).getDescription().contains(searchText))
                 .mapToObj(index -> (index + 1) + "." + tasks.get(index))
-                .collect(Collectors.joining("\n"));
+                .toList();
+        if (matchingTasks.isEmpty()) {
+            return "Nothing appeared on the radar for '" + searchText + "'.";
+        }
+
+        return "Radar found these matching missions:\n" + String.join("\n", matchingTasks);
     }
 
     /**

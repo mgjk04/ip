@@ -9,6 +9,6 @@ public class StorageException extends EchoException {
      * @param message explanation of what went wrong.
      */
     public StorageException(String message) {
-        super("Storage exception occurred. " + message);
+        super("Mission archive problem: " + message);
     }
 }

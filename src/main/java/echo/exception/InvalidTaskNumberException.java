@@ -6,6 +6,6 @@ package echo.exception;
 public class InvalidTaskNumberException extends EchoException {
     /** Creates the error shown when the given task number matches no task. */
     public InvalidTaskNumberException() {
-        super("Please provide a valid task number. Check the list and choose a valid task number.");
+        super("That mission number is not on the manifest. Use list to check the available numbers.");
     }
 }

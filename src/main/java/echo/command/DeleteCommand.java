@@ -31,8 +31,9 @@ public class DeleteCommand extends Command {
     public String execute(TaskList taskList, Ui ui, Storage storage) throws EchoException {
         Task removed = taskList.delete(index);
         storage.save(taskList.getAll());
-        return ui.joinLines("Noted. I've removed this task:",
+        String missionNoun = taskList.size() == 1 ? "mission" : "missions";
+        return ui.joinLines("Mission removed from the manifest:",
                 removed.toString(),
-                "Now you have " + taskList.size() + " tasks in the list.");
+                "You now have " + taskList.size() + " " + missionNoun + " on the manifest.");
     }
 }

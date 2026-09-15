@@ -104,7 +104,7 @@ public class TaskListTest {
         tasks.add(new TaskStub("alpha"));
         tasks.add(new TaskStub("beta"));
 
-        String expected = "Here are the tasks in your list:\n"
+        String expected = "Current mission manifest:\n"
                 + "1.[ ] alpha\n"
                 + "2.[ ] beta";
         assertEquals(expected, tasks.listAsText());
@@ -184,7 +184,7 @@ public class TaskListTest {
         // so an empty list keeps the header's own trailing newline.
         TaskList tasks = new TaskList();
 
-        assertEquals("Here are the tasks in your list:\n", tasks.listAsText());
+        assertEquals("The mission manifest is clear.", tasks.listAsText());
     }
 
     @Test
@@ -194,7 +194,7 @@ public class TaskListTest {
         done.markDone();
         tasks.add(done);
 
-        assertEquals("Here are the tasks in your list:\n1.[X] finished",
+        assertEquals("Current mission manifest:\n1.[X] finished",
                 tasks.listAsText());
     }
 
@@ -207,7 +207,7 @@ public class TaskListTest {
         tasks.add(new TaskStub("water plants"));
         tasks.add(new TaskStub("return book"));
 
-        String expected = "Here are the matching tasks in your list:\n"
+        String expected = "Radar found these matching missions:\n"
                 + "1.[ ] read book\n"
                 + "3.[ ] return book";
         assertEquals(expected, tasks.searchListText("book"));
@@ -218,7 +218,7 @@ public class TaskListTest {
         TaskList tasks = new TaskList();
         tasks.add(new TaskStub("read book"));
 
-        assertEquals("Here are the matching tasks in your list:\n",
+        assertEquals("Nothing appeared on the radar for 'zebra'.",
                 tasks.searchListText("zebra"));
     }
 
@@ -246,19 +246,19 @@ public class TaskListTest {
         tasks.add(completedEvent);
         tasks.add(new Todo("buy groceries"));
 
-        String expected = "Statistics:\n\n"
-                + "Global:\n"
-                + "Total Tasks: 4\n"
-                + "Total Completed: 3\n"
-                + "Total Incomplete: 1\n"
-                + "Todos Completed: 1\n"
-                + "Events Completed: 1\n"
-                + "Deadlines Completed: 1\n\n"
-                + "Week:\n"
+        String expected = "Mission progress report:\n\n"
+                + "All missions:\n"
+                + "Total missions: 4\n"
+                + "Completed: 3\n"
+                + "Active: 1\n"
+                + "Todos completed: 1\n"
+                + "Events completed: 1\n"
+                + "Deadlines completed: 1\n\n"
+                + "This week:\n"
                 + "Completed: 2\n"
-                + "Todos Completed: 1\n"
-                + "Events Completed: 1\n"
-                + "Deadlines Completed: 0";
+                + "Todos completed: 1\n"
+                + "Events completed: 1\n"
+                + "Deadlines completed: 0";
 
         assertEquals(expected, tasks.getStatistics(LocalDateTime.of(2026, 9, 7, 12, 0)));
     }
@@ -274,6 +274,6 @@ public class TaskListTest {
         tasks.add(earlierTask);
 
         assertTrue(tasks.getStatistics(LocalDateTime.of(2026, 9, 7, 0, 0))
-                .contains("Completed: 1\nTodos Completed: 1"));
+                .contains("Completed: 1\nTodos completed: 1"));
     }
 }

@@ -30,8 +30,9 @@ public class AddCommand extends Command {
     public String execute(TaskList taskList, Ui ui, Storage storage) throws EchoException {
         taskList.add(task);
         storage.save(taskList.getAll());
-        return ui.joinLines("Got it. I've added this task:",
+        String missionNoun = taskList.size() == 1 ? "mission" : "missions";
+        return ui.joinLines("Mission logged:",
                 task.toString(),
-                "Now you have " + taskList.size() + " tasks in the list.");
+                "You now have " + taskList.size() + " " + missionNoun + " on the manifest.");
     }
 }

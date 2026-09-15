@@ -6,6 +6,6 @@ package echo.exception;
 public class TodoFormatException extends EchoException {
     /** Creates the error shown when a {@code todo} command has no description. */
     public TodoFormatException() {
-        super("Invalid todo command. Format: todo <description>");
+        super("I need a mission description. Try: todo <description>");
     }
 }

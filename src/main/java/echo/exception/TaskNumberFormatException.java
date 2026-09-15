@@ -9,6 +9,6 @@ public class TaskNumberFormatException extends EchoException {
      * @param keyword command keyword, e.g. {@code mark}
      */
     public TaskNumberFormatException(String keyword) {
-        super("Invalid " + keyword + " command. Format: " + keyword + " <taskNumber>");
+        super("I need a mission number. Try: " + keyword + " <taskNumber>");
     }
 }
