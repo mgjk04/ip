@@ -6,7 +6,6 @@ import java.time.temporal.ChronoUnit;
 import echo.storage.Storage;
 import echo.task.TaskList;
 import echo.ui.Ui;
-//Codex assistance
 
 /**
  * Shows global and current-week task completion statistics.
