@@ -36,6 +36,10 @@ public class DeleteCommand extends Command {
         proposedTasks.remove(index);
         storage.save(proposedTasks);
         taskList.delete(index);
+        return formatResponse(taskList, ui, removed);
+    }
+
+    private static String formatResponse(TaskList taskList, Ui ui, Task removed) {
         String missionNoun = taskList.size() == 1 ? "mission" : "missions";
         return ui.joinLines("Mission removed from the manifest:",
                 removed.toString(),
