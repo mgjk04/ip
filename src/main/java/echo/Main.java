@@ -50,7 +50,7 @@ public class Main extends Application {
         Alert alert = new Alert(AlertType.ERROR);
         alert.setTitle("Echo could not start");
         alert.setHeaderText("A required application resource could not be loaded.");
-        alert.setContentText("Please reinstall Echo or contact support.");
+        alert.setContentText("Please reinstall Echo.");
         alert.showAndWait();
         Platform.exit();
     }

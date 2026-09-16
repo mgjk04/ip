@@ -25,7 +25,7 @@ public class Ui {
     }
 
     /**
-     * Sends the salutation message.
+     * Sends the greeting message.
      */
     public String greet() {
         String banner = " _____     _           \n"

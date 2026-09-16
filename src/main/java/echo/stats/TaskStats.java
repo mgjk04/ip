@@ -48,7 +48,7 @@ public class TaskStats {
         ));
         for (TaskType taskType : TaskType.values()) {
             completedCounts.put(taskType.toString(), 0);
-            completedCounts.put(taskType.toString() + WEEKLY_KEY_SUFFIX, 0);
+            completedCounts.put(taskType + WEEKLY_KEY_SUFFIX, 0);
         }
 
         tasks.stream().filter(Task::isDone)
