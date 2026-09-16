@@ -14,6 +14,8 @@ import echo.ui.Ui;
  * only in the status written and the wording of the confirmation.
  */
 public class MarkCommand extends Command {
+    private static final String MARK_DONE_MESSAGE = "Mission complete. Nicely landed:";
+    private static final String MARK_NOT_DONE_MESSAGE = "Mission reopened. It's back on the radar:";
     private final int index;
     private final boolean isDone;
 
@@ -49,8 +51,8 @@ public class MarkCommand extends Command {
         }
 
         String confirmation = isDone
-                ? "Mission complete. Nicely landed:"
-                : "Mission reopened. It's back on the radar:";
+                ? MARK_DONE_MESSAGE
+                : MARK_NOT_DONE_MESSAGE;
         return ui.joinLines(confirmation, task.toString());
     }
 
