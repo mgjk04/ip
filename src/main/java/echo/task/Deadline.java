@@ -1,6 +1,7 @@
 package echo.task;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import echo.utils.DateTimeUtility;
 
@@ -20,7 +21,7 @@ public class Deadline extends Task {
      */
     public Deadline(String description, LocalDateTime by) {
         super(description);
-        this.by = by;
+        this.by = Objects.requireNonNull(by, "A deadline date-time must not be null.");
     }
 
     /**
@@ -60,6 +61,11 @@ public class Deadline extends Task {
     @Override
     public TaskType getTaskType() {
         return TYPE;
+    }
+
+    @Override
+    boolean hasSameSchedule(Task other) {
+        return by.equals(((Deadline) other).by);
     }
 }
 

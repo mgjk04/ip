@@ -20,9 +20,11 @@ import echo.exception.DeleteFormatException;
 import echo.exception.EchoException;
 import echo.exception.EventFormatException;
 import echo.exception.FindFormatException;
+import echo.exception.InvalidEventPeriodException;
 import echo.exception.InvalidTaskNumberException;
 import echo.exception.StatsFormatException;
 import echo.exception.TodoFormatException;
+import echo.exception.UnexpectedArgumentsException;
 import echo.exception.UnknownCommandException;
 import echo.storage.Storage;
 import echo.task.Deadline;
@@ -58,6 +60,31 @@ public class ParserTest {
     @Test
     public void parse_unknownKeyword_exceptionThrown() {
         assertThrows(UnknownCommandException.class, () -> new Parser().parse("frobnicate"));
+    }
+
+    @Test
+    public void parse_nullOrBlankInput_exceptionThrown() {
+        Parser parser = new Parser();
+
+        assertThrows(UnknownCommandException.class, () -> parser.parse(null));
+        assertThrows(UnknownCommandException.class, () -> parser.parse(" \t "));
+    }
+
+    @Test
+    public void parse_repeatedWhitespace_normalizesDescription() throws Exception {
+        TaskList tasks = new TaskList();
+
+        execute(new Parser().parse("\t todo\tread   book  "), tasks);
+
+        assertEquals("read book", tasks.getTask(0).getDescription());
+    }
+
+    @Test
+    public void parse_argumentFreeCommandWithArguments_exceptionThrown() {
+        Parser parser = new Parser();
+
+        assertThrows(UnexpectedArgumentsException.class, () -> parser.parse("list now"));
+        assertThrows(UnexpectedArgumentsException.class, () -> parser.parse("bye now"));
     }
 
     @Test
@@ -118,6 +145,29 @@ public class ParserTest {
     }
 
     @Test
+    public void parse_deadlineImpossibleDate_exceptionThrown() {
+        Parser parser = new Parser();
+
+        assertThrows(DeadlineFormatException.class, () -> parser.parse(
+                "deadline invalid /by 2019-02-30 1200"));
+        assertThrows(DeadlineFormatException.class, () -> parser.parse(
+                "deadline invalid /by 2019-04-31 1200"));
+        assertThrows(DeadlineFormatException.class, () -> parser.parse(
+                "deadline invalid /by 2019-12-31 2400"));
+    }
+
+    @Test
+    public void parse_deadlineRepeatedParameter_exceptionThrown() {
+        assertThrows(DeadlineFormatException.class, () -> new Parser().parse(
+                "deadline return book /by 2025-01-15 1800 /by 2025-01-16 1800"));
+    }
+
+    @Test
+    public void parse_deadlineValidLeapDay_returnsAddCommand() throws EchoException {
+        assertTrue(new Parser().parse("deadline leap day /by 2024-02-29 1200") instanceof AddCommand);
+    }
+
+    @Test
     public void parse_validDeadline_parsesDueDateTime() throws Exception {
         AddCommand cmd = (AddCommand)
                 new Parser().parse("deadline return book /by 2025-01-15 1800");
@@ -142,10 +192,45 @@ public class ParserTest {
     }
 
     @Test
+    public void parse_eventEqualOrReversedTimes_exceptionThrown() {
+        Parser parser = new Parser();
+
+        assertThrows(InvalidEventPeriodException.class, () -> parser.parse(
+                "event meeting /from 2025-01-15 1800 /to 2025-01-15 1800"));
+        assertThrows(InvalidEventPeriodException.class, () -> parser.parse(
+                "event meeting /from 2025-01-15 1900 /to 2025-01-15 1800"));
+    }
+
+    @Test
+    public void parse_eventRepeatedOrMisorderedParameter_exceptionThrown() {
+        Parser parser = new Parser();
+
+        assertThrows(EventFormatException.class, () -> parser.parse(
+                "event meeting /from 2025-01-15 1700 /from 2025-01-15 1800 /to 2025-01-15 1900"));
+        assertThrows(EventFormatException.class, () -> parser.parse(
+                "event meeting /to 2025-01-15 1900 /from 2025-01-15 1800"));
+    }
+
+    @Test
+    public void parse_eventWithTabs_returnsAddCommand() throws EchoException {
+        assertTrue(new Parser().parse(
+                "event\tmeeting\t/from\t2025-01-15\t1800\t/to\t2025-01-15\t1900") instanceof AddCommand);
+    }
+
+    @Test
     public void parse_markNonNumericIndex_exceptionThrown() {
         // Note: unlike delete (DeleteFormatException for both cases), mark
         // reports a non-numeric index as InvalidTaskNumberException.
         assertThrows(InvalidTaskNumberException.class, () -> new Parser().parse("mark abc"));
+    }
+
+    @Test
+    public void parse_markSignedOrMultipleIndex_exceptionThrown() {
+        Parser parser = new Parser();
+
+        assertThrows(InvalidTaskNumberException.class, () -> parser.parse("mark +1"));
+        assertThrows(InvalidTaskNumberException.class, () -> parser.parse("mark -1"));
+        assertThrows(InvalidTaskNumberException.class, () -> parser.parse("mark 1 2"));
     }
 
     @Test

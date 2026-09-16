@@ -3,6 +3,7 @@ package echo.task;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 
 import echo.exception.CorruptFormatException;
 import echo.exception.StorageException;
@@ -22,6 +23,13 @@ public abstract class Task {
      * @param description text that describes the task
      */
     public Task(String description) {
+        Objects.requireNonNull(description, "A task description must not be null.");
+        if (description.isBlank()) {
+            throw new IllegalArgumentException("A task description must not be blank.");
+        }
+        if (description.contains("|") || description.chars().anyMatch(Character::isISOControl)) {
+            throw new IllegalArgumentException("A task description contains unsupported characters.");
+        }
         this.description = description;
         this.completedAt = null;
     }
@@ -41,7 +49,7 @@ public abstract class Task {
 
     /** Marks this task as complete at the supplied local date-time. */
     public void markDone(LocalDateTime completionTime) {
-        completedAt = completionTime.truncatedTo(ChronoUnit.MINUTES);
+        completedAt = Objects.requireNonNull(completionTime).truncatedTo(ChronoUnit.MINUTES);
     }
 
     /** Marks this task as incomplete. */
@@ -122,6 +130,24 @@ public abstract class Task {
      * @return {@link TaskType} of the task
      */
     public abstract TaskType getTaskType();
+
+    /**
+     * Returns whether another task has the same identity-defining details.
+     * Completion status is deliberately excluded.
+     *
+     * @param other Task to compare.
+     * @return Whether both tasks have the same type, description, and schedule.
+     */
+    final boolean hasSameDetails(Task other) {
+        return other != null
+                && getTaskType() == other.getTaskType()
+                && description.equals(other.description)
+                && hasSameSchedule(other);
+    }
+
+    boolean hasSameSchedule(Task other) {
+        return true;
+    }
 
     /**
      * Creates String representation of a task.

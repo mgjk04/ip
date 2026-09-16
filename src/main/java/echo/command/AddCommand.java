@@ -1,11 +1,14 @@
 package echo.command;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import echo.exception.DuplicateTaskException;
 import echo.exception.EchoException;
 import echo.storage.Storage;
 import echo.task.Task;
 import echo.task.TaskList;
 import echo.ui.Ui;
-//Codex assistance
 
 /**
  * Adds one parsed task to the list and confirms the new task count.
@@ -28,8 +31,13 @@ public class AddCommand extends Command {
      */
     @Override
     public String execute(TaskList taskList, Ui ui, Storage storage) throws EchoException {
+        if (taskList.containsTaskWithSameDetails(task)) {
+            throw new DuplicateTaskException();
+        }
+        List<Task> proposedTasks = new ArrayList<>(taskList.getAll());
+        proposedTasks.add(task);
+        storage.save(proposedTasks);
         taskList.add(task);
-        storage.save(taskList.getAll());
         String missionNoun = taskList.size() == 1 ? "mission" : "missions";
         return ui.joinLines("Mission logged:",
                 task.toString(),
