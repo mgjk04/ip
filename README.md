@@ -34,12 +34,12 @@ Prerequisites: JDK 25, update Intellij to the most recent version.
 * Performing repetitive / manual tasks (e.g. ASCII banner generation).
 * present-changes-visually skill: https://github.com/se-edu/skill-present-changes-visually.
 * test-ui skill from ip Level-4 AI guidance section
-* Code generation as directed by ip instructions under "AI Guidance" sections. Such code will be annotated with comments.
+* Code generation as directed by ip instructions under "AI Guidance" sections (usage ranges from AI-2 to AI-5).
 ### OpenCode:
 ~~Started to use OpenCode after Codex usage ran out.~~
 * Suggestions on code improvements.
 * Performing repetitive / manual tasks (e.g. ASCII banner generation).
-* Code generation as guided by ip instructions under "AI Guidance" sections. Such code will be annotated with comments.
+* Code generation as guided by ip instructions under "AI Guidance" sections.(usage ranges from AI-4 to AI-5)
 ### Gemini:
 * Search engine.
 * Learn about concepts.
