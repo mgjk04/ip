@@ -1,11 +1,13 @@
 package echo.command;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import echo.exception.EchoException;
 import echo.storage.Storage;
 import echo.task.Task;
 import echo.task.TaskList;
 import echo.ui.Ui;
-//Codex assistance
 
 /**
  * Removes one task from the list by its zero-based index.
@@ -29,8 +31,11 @@ public class DeleteCommand extends Command {
      */
     @Override
     public String execute(TaskList taskList, Ui ui, Storage storage) throws EchoException {
-        Task removed = taskList.delete(index);
-        storage.save(taskList.getAll());
+        Task removed = taskList.getTask(index);
+        List<Task> proposedTasks = new ArrayList<>(taskList.getAll());
+        proposedTasks.remove(index);
+        storage.save(proposedTasks);
+        taskList.delete(index);
         String missionNoun = taskList.size() == 1 ? "mission" : "missions";
         return ui.joinLines("Mission removed from the manifest:",
                 removed.toString(),

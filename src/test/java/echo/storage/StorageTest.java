@@ -83,6 +83,54 @@ public class StorageTest {
     }
 
     @Test
+    public void read_corruptSecondLine_errorIdentifiesLineNumber() throws Exception {
+        Path file = tempDir.resolve("line-number.txt");
+        Files.writeString(file, "T |  | valid\nD |  | invalid | not-a-date");
+
+        StorageException exception = assertThrows(StorageException.class, () -> new Storage(file).read());
+
+        assertTrue(exception.getMessage().contains("line 2"));
+    }
+
+    @Test
+    public void read_duplicateTask_throwsStorageException() throws Exception {
+        Path file = tempDir.resolve("duplicate.txt");
+        Files.writeString(file, "T |  | read book\nT | 2025-01-13T12:45 | read book");
+
+        StorageException exception = assertThrows(StorageException.class, () -> new Storage(file).read());
+
+        assertTrue(exception.getMessage().contains("duplicates an earlier mission"));
+    }
+
+    @Test
+    public void read_caseDifferentDescriptions_returnsBothTasks() throws Exception {
+        Path file = tempDir.resolve("case-sensitive.txt");
+        Files.writeString(file, "T |  | read book\nT |  | Read book");
+
+        assertEquals(2, new Storage(file).read().size());
+    }
+
+    @Test
+    public void saveThenRead_unicodeDescription_roundTrips() throws Exception {
+        Storage storage = storageAt("unicode.txt");
+        Todo task = new Todo("réviser 日本語");
+
+        storage.save(List.of(task));
+
+        assertEquals(task.toSaveFormat(), storage.read().get(0).toSaveFormat());
+    }
+
+    @Test
+    public void save_parentIsRegularFile_throwsStorageException() throws Exception {
+        Path parentFile = tempDir.resolve("not-a-directory");
+        Files.writeString(parentFile, "unchanged");
+        Storage storage = new Storage(parentFile.resolve("echo.txt"));
+
+        assertThrows(StorageException.class, () -> storage.save(sampleTasks()));
+        assertEquals("unchanged", Files.readString(parentFile));
+    }
+
+    @Test
     public void read_blankLines_skipped() throws Exception {
         Path file = tempDir.resolve("blanks.txt");
         Files.writeString(file, "\n\nT |  | read book\n   \n");

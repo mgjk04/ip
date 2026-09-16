@@ -1,11 +1,12 @@
 package echo.command;
 
+import java.time.LocalDateTime;
+
 import echo.exception.EchoException;
 import echo.storage.Storage;
 import echo.task.Task;
 import echo.task.TaskList;
 import echo.ui.Ui;
-//Codex assistance
 
 /**
  * Updates the completion status of the task at a zero-based index.
@@ -34,15 +35,30 @@ public class MarkCommand extends Command {
     @Override
     public String execute(TaskList taskList, Ui ui, Storage storage) throws EchoException {
         Task task = taskList.getTask(index);
-        String response = "";
+        LocalDateTime previousCompletionTime = task.getCompletedAt();
         if (this.isDone) {
             task.markDone();
-            response = ui.joinLines("Mission complete. Nicely landed:", task.toString());
         } else {
             task.markNotDone();
-            response = ui.joinLines("Mission reopened. It's back on the radar:", task.toString());
         }
-        storage.save(taskList.getAll());
-        return response;
+        try {
+            storage.save(taskList.getAll());
+        } catch (EchoException exception) {
+            restoreCompletionTime(task, previousCompletionTime);
+            throw exception;
+        }
+
+        String confirmation = isDone
+                ? "Mission complete. Nicely landed:"
+                : "Mission reopened. It's back on the radar:";
+        return ui.joinLines(confirmation, task.toString());
+    }
+
+    private void restoreCompletionTime(Task task, LocalDateTime previousCompletionTime) {
+        if (previousCompletionTime == null) {
+            task.markNotDone();
+        } else {
+            task.markDone(previousCompletionTime);
+        }
     }
 }

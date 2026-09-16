@@ -1,15 +1,18 @@
 package echo.storage;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
+import java.util.Objects;
 
+import echo.exception.CorruptFormatException;
 import echo.exception.StorageException;
 import echo.task.Task;
-//Codex assistance
+import echo.task.TaskList;
 
 /**
  * Saves the task list to a file on disk.
@@ -34,7 +37,7 @@ public class Storage {
      * @param fileSavePath {@link Path} of save file
      */
     public Storage(Path fileSavePath) {
-        this.saveFile = fileSavePath;
+        this.saveFile = Objects.requireNonNull(fileSavePath, "The save-file path must not be null.");
     }
 
     /**
@@ -45,16 +48,14 @@ public class Storage {
      * @throws StorageException when writing to the save file fails
      */
     public void save(List<Task> tasks) throws StorageException {
-        assert tasks != null : "Storage.save requires a task collection.";
-        List<String> lines = new ArrayList<>();
-        for (Task t : tasks) {
-            assert t != null : "A saved task collection must not contain null tasks.";
-            lines.add(t.toSaveFormat());
-        }
+        Objects.requireNonNull(tasks, "The saved task collection must not be null.");
+        List<String> lines = serialize(tasks);
+        Path absoluteSaveFile = saveFile.toAbsolutePath();
+        Path parentDirectory = absoluteSaveFile.getParent();
         try {
-            Files.createDirectories(saveFile.getParent());
-            Files.write(saveFile, lines);
-        } catch (IOException e) {
+            Files.createDirectories(parentDirectory);
+            Files.write(absoluteSaveFile, lines, StandardCharsets.UTF_8);
+        } catch (IOException | SecurityException exception) {
             throw new StorageException("I could not save your missions to " + saveFile + ".");
         }
     }
@@ -69,22 +70,50 @@ public class Storage {
      * @throws StorageException when reading fails or a line is malformed
      */
     public List<Task> read() throws StorageException {
-        List<Task> tasks = new ArrayList<>();
-        if (!Files.exists(saveFile)) {
-            return tasks;
+        if (Files.notExists(saveFile)) {
+            return new ArrayList<>();
         }
-        try (Scanner scanner = new Scanner(saveFile)) {
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine().trim();
-                if (!line.isEmpty()) {
-                    Task task = Task.fromSaveFormat(line);
-                    assert task != null : "A valid save record must reconstruct to a task.";
-                    tasks.add(task);
+
+        TaskList loadedTasks = new TaskList();
+        try (BufferedReader reader = Files.newBufferedReader(saveFile, StandardCharsets.UTF_8)) {
+            String rawLine;
+            int lineNumber = 0;
+            while ((rawLine = reader.readLine()) != null) {
+                lineNumber++;
+                String line = rawLine.trim();
+                if (line.isEmpty()) {
+                    continue;
                 }
+                Task task = parseRecord(line, lineNumber);
+                if (loadedTasks.containsTaskWithSameDetails(task)) {
+                    throw new CorruptFormatException(lineNumber, line,
+                            "it duplicates an earlier mission");
+                }
+                loadedTasks.add(task);
             }
-            return tasks;
-        } catch (IOException e) {
+            return new ArrayList<>(loadedTasks.getAll());
+        } catch (IOException | SecurityException exception) {
             throw new StorageException("I could not read your missions at " + saveFile + ".");
         }
     }
+
+    private List<String> serialize(List<Task> tasks) throws StorageException {
+        List<String> lines = new ArrayList<>();
+        for (Task task : tasks) {
+            if (task == null) {
+                throw new StorageException("I could not save a missing mission record.");
+            }
+            lines.add(task.toSaveFormat());
+        }
+        return lines;
+    }
+
+    private Task parseRecord(String line, int lineNumber) throws CorruptFormatException {
+        try {
+            return Task.fromSaveFormat(line);
+        } catch (StorageException exception) {
+            throw new CorruptFormatException(lineNumber, line, "its fields are invalid");
+        }
+    }
+
 }

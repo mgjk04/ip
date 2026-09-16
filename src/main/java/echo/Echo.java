@@ -47,10 +47,10 @@ public class Echo {
             var loadedTasks = storage.read();
             assert loadedTasks != null : "Storage.read must return a task collection.";
             taskList.addAll(loadedTasks);
-        } catch (StorageException e) {
-            ui.showError(e);
+            return ui.greet();
+        } catch (StorageException exception) {
+            return ui.joinLines(ui.greet(), ui.showError(exception));
         }
-        return ui.greet();
     }
 
     /**
