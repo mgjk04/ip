@@ -11,4 +11,15 @@ public class CorruptFormatException extends StorageException {
     public CorruptFormatException(String saveFormat) {
         super("I could not understand this record: " + saveFormat);
     }
+
+    /**
+     * Creates an error identifying an invalid save-file line.
+     *
+     * @param lineNumber One-indexed line number.
+     * @param saveFormat Invalid record text.
+     * @param reason Reason the record is invalid.
+     */
+    public CorruptFormatException(int lineNumber, String saveFormat, String reason) {
+        super("I could not understand line " + lineNumber + " because " + reason + ": " + saveFormat);
+    }
 }

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.IntStream;
 
 import echo.exception.InvalidTaskNumberException;
@@ -31,8 +32,7 @@ public class TaskList {
      * @param task task to add
      */
     public void add(Task task) {
-        assert task != null : "A task list must not contain null tasks.";
-        tasks.add(task);
+        tasks.add(Objects.requireNonNull(task, "A task list must not contain null tasks."));
     }
 
     /**
@@ -41,7 +41,20 @@ public class TaskList {
      * @param newTasks tasks to append in their given order
      */
     public void addAll(List<Task> newTasks) {
-        tasks.addAll(newTasks);
+        Objects.requireNonNull(newTasks, "The added task collection must not be null.");
+        for (Task task : newTasks) {
+            add(task);
+        }
+    }
+
+    /**
+     * Returns whether a task with the same identifying details is already present.
+     *
+     * @param candidate Task to compare with the current list.
+     * @return Whether an equivalent task exists.
+     */
+    public boolean containsTaskWithSameDetails(Task candidate) {
+        return tasks.stream().anyMatch(task -> task.hasSameDetails(candidate));
     }
 
     /**

@@ -47,8 +47,9 @@ public class Ui {
     }
 
     /**
-     * Sends the input messages joined as a single string
-     * @param lines lines of messages to be wrapped by the separator.
+     * Sends the input messages joined as a single string.
+     *
+     * @param lines Lines of messages to be combined, each on a new line.
      */
     public String joinLines(String... lines) {
         return String.join("\n", lines);

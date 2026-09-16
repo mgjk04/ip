@@ -10,7 +10,7 @@ import echo.ui.Ui;
  */
 public class ExitCommand extends Command {
     /**
-     * Does nothing itself; Echo prints its farewell once the loop ends.
+     * Sends the farewell message.
      * See: {@link Command#execute(TaskList, Ui, Storage)}
      */
     @Override
@@ -19,7 +19,7 @@ public class ExitCommand extends Command {
     }
 
     /**
-     * Exiting is this command's whole purpose.
+     * Indicates that the command loop should end.
      */
     @Override
     public boolean isExit() {

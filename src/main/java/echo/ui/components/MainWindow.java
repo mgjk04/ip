@@ -1,5 +1,7 @@
 package echo.ui.components;
 
+import java.net.URL;
+
 import echo.Echo;
 import echo.ui.EchoResponse;
 import echo.ui.ResponseType;
@@ -27,8 +29,8 @@ public class MainWindow extends AnchorPane {
 
     private Echo echo;
 
-    private Image userImage = new Image(this.getClass().getResourceAsStream("/images/DaUser.png"));
-    private Image echoImage = new Image(this.getClass().getResourceAsStream("/images/DaEcho.png"));
+    private final Image userImage = loadImage("/images/DaUser.png");
+    private final Image echoImage = loadImage("/images/DaEcho.png");
 
     /** Initializes automatic scrolling for the conversation. */
     @FXML
@@ -68,5 +70,13 @@ public class MainWindow extends AnchorPane {
         if (echo.isExit()) {
             Platform.exit();
         }
+    }
+
+    private Image loadImage(String resourcePath) {
+        URL imageResource = getClass().getResource(resourcePath);
+        if (imageResource == null) {
+            throw new IllegalStateException("A required avatar image is missing.");
+        }
+        return new Image(imageResource.toExternalForm());
     }
 }

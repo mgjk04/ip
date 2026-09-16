@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
@@ -36,7 +37,7 @@ public class EchoTest {
         EchoResponse response = echo.getTypedResponse("unknown-command");
 
         assertEquals(ResponseType.ERROR, response.type());
-        assertTrue(response.text().startsWith("OOPS!!!"));
+        assertTrue(response.text().startsWith("Signal scrambled."));
     }
 
     @Test
@@ -60,5 +61,19 @@ public class EchoTest {
 
         assertTrue(listResponse.contains("1.[T][ ] inspect reactor"));
         assertFalse(listResponse.contains("2."));
+    }
+
+    @Test
+    public void start_corruptSaveFile_showsWarningAndLoadsNoTasks() throws Exception {
+        Path saveFile = tempDir.resolve("corrupt-startup.txt");
+        Files.writeString(saveFile, "T |  | valid\nD |  | broken | invalid-date");
+        Echo echo = new Echo(saveFile);
+
+        String startupResponse = echo.start();
+        String listResponse = echo.getResponse("list");
+
+        assertTrue(startupResponse.contains("Mission archive problem"));
+        assertTrue(startupResponse.contains("line 2"));
+        assertTrue(listResponse.contains("manifest is clear"));
     }
 }

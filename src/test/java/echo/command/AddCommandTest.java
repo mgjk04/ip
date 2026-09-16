@@ -1,12 +1,14 @@
 package echo.command;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import echo.exception.DuplicateTaskException;
 import echo.storage.Storage;
 import echo.task.TaskList;
 import echo.task.Todo;
@@ -39,6 +41,18 @@ public class AddCommandTest {
         assertEquals("Mission logged:\n"
                 + "[T][ ] write code\n"
                 + "You now have 2 missions on the manifest.", response);
+    }
+
+    @Test
+    public void execute_duplicateTask_exceptionThrownAndListUnchanged() throws Exception {
+        TaskList tasks = new TaskList();
+        Todo existingTask = new Todo("read book");
+        existingTask.markDone();
+        tasks.add(existingTask);
+
+        assertThrows(DuplicateTaskException.class, () -> new AddCommand(new Todo("read book"))
+                .execute(tasks, new Ui(), storage()));
+        assertEquals(1, tasks.size());
     }
 
     private Storage storage() {

@@ -1,6 +1,7 @@
 package echo.ui.components;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Collections;
 
 import javafx.beans.binding.Bindings;
@@ -40,7 +41,11 @@ public class DialogBox extends HBox {
     private DialogBox(String text, Image image, ObservableValue<Bounds> viewportBounds,
                       double widthRatio) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(MainWindow.class.getResource("/view/DialogBox.fxml"));
+            URL layout = MainWindow.class.getResource("/view/DialogBox.fxml");
+            if (layout == null) {
+                throw new IllegalStateException("The dialog-box layout is missing.");
+            }
+            FXMLLoader fxmlLoader = new FXMLLoader(layout);
             fxmlLoader.setController(this);
             fxmlLoader.setRoot(this);
             fxmlLoader.load();

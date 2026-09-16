@@ -1,6 +1,7 @@
 package echo.task;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import echo.utils.DateTimeUtility;
 
@@ -22,8 +23,11 @@ public class Event extends Task {
      */
     public Event(String description, LocalDateTime from, LocalDateTime to) {
         super(description);
-        this.from = from;
-        this.to = to;
+        this.from = Objects.requireNonNull(from, "An event start date-time must not be null.");
+        this.to = Objects.requireNonNull(to, "An event end date-time must not be null.");
+        if (!from.isBefore(to)) {
+            throw new IllegalArgumentException("An event must start before it ends.");
+        }
     }
 
     /**
@@ -63,5 +67,11 @@ public class Event extends Task {
     @Override
     public TaskType getTaskType() {
         return TYPE;
+    }
+
+    @Override
+    boolean hasSameSchedule(Task other) {
+        Event otherEvent = (Event) other;
+        return from.equals(otherEvent.from) && to.equals(otherEvent.to);
     }
 }

@@ -47,10 +47,10 @@ public class Echo {
             var loadedTasks = storage.read();
             assert loadedTasks != null : "Storage.read must return a task collection.";
             taskList.addAll(loadedTasks);
-        } catch (StorageException e) {
-            ui.showError(e);
+            return ui.greet();
+        } catch (StorageException exception) {
+            return ui.joinLines(ui.greet(), ui.showError(exception));
         }
-        return ui.greet();
     }
 
     /**
@@ -62,9 +62,10 @@ public class Echo {
     }
 
     /**
-     * Processes the user input and returns Echo's response
-     * @param input user input
-     * @return Echo's output
+     * Processes the user input and returns Echo's response.
+     *
+     * @param input User input.
+     * @return Echo's output.
      */
     public String getResponse(String input) {
         return getTypedResponse(input).text();

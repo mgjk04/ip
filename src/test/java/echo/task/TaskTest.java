@@ -103,6 +103,46 @@ public class TaskTest {
     }
 
     @Test
+    public void fromSaveFormat_invalidEventPeriod_exceptionThrown() {
+        assertThrows(CorruptFormatException.class, () -> Task.fromSaveFormat(
+                "E |  | meeting | " + ISO_END + " | " + ISO_DATE));
+    }
+
+    @Test
+    public void hasSameDetails_completionStatusDiffers_returnsTrue() {
+        Todo incompleteTask = new Todo("read book");
+        Todo completeTask = new Todo("read book");
+        completeTask.markDone(LocalDateTime.of(2025, 1, 13, 12, 45));
+
+        assertTrue(incompleteTask.hasSameDetails(completeTask));
+    }
+
+    @Test
+    public void hasSameDetails_caseOrScheduleDiffers_returnsFalse() {
+        assertFalse(new Todo("read book").hasSameDetails(new Todo("Read book")));
+        assertFalse(new Deadline("return book", LocalDateTime.parse(ISO_DATE))
+                .hasSameDetails(new Deadline("return book", LocalDateTime.parse(ISO_END))));
+    }
+
+    @Test
+    public void hasSameDetails_matchingDeadlineOrEvent_returnsTrue() {
+        LocalDateTime start = LocalDateTime.parse(ISO_DATE);
+        LocalDateTime end = LocalDateTime.parse(ISO_END);
+
+        assertTrue(new Deadline("return book", start)
+                .hasSameDetails(new Deadline("return book", start)));
+        assertTrue(new Event("meeting", start, end)
+                .hasSameDetails(new Event("meeting", start, end)));
+    }
+
+    @Test
+    public void constructor_blankOrUnsupportedDescription_exceptionThrown() {
+        assertThrows(IllegalArgumentException.class, () -> new Todo("   "));
+        assertThrows(IllegalArgumentException.class, () -> new Todo("first|second"));
+        assertThrows(IllegalArgumentException.class, () -> new Todo("first\nsecond"));
+    }
+
+    @Test
     public void fromSaveFormat_secondPrecisionCompletionTime_exceptionThrown() {
         assertThrows(CorruptFormatException.class, () -> Task.fromSaveFormat(
                 "T | 2025-01-13T12:45:01 | read book"));

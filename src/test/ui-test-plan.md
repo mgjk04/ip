@@ -29,9 +29,9 @@ D |  | return book | 2019-12-02T18:00
 E |  | project meeting | 2019-12-02T14:00 | 2019-12-02T16:00
 ```
 
-On startup Echo reads `../../data/echo.txt` (if present) and restores those tasks before greeting; a missing file starts an empty list, and a malformed line reports a storage error instead of aborting (see the last two cases). Task details must not contain `|` because it separates saved fields; inputs that do are rejected outright (see the "pipe characters are rejected" case). The previous `T | 0 | description` completion-flag format is not supported. To verify persistence manually from a known state:
+On startup Echo reads `data/echo.txt` (if present) and restores those tasks before greeting; a missing file starts an empty list, and any malformed or duplicate line rejects the entire file with a line-numbered storage warning. Task details must not contain `|` because it separates saved fields; inputs that do are rejected outright (see the "pipe characters are rejected" case). The previous `T | 0 | description` completion-flag format is not supported. To verify persistence manually from a known state:
 
-1. Delete `../../data/echo.txt`, run one session that adds `todo borrow book`, then quit with `bye`.
+1. Delete `data/echo.txt`, run one session that adds `todo borrow book`, then quit with `bye`.
 2. Start a new session entering `list`: `[T][ ] borrow book` must appear.
 3. Re-running the same session after `mark 1` must show `[T][X] borrow book`; its save line has a nonblank completion date-time.
 
@@ -453,13 +453,15 @@ Echo going off-air. See you on the next mission!
 
 ## Test case: date values are validated and formatted
 
-- **Aim:** Verify that Level-8 date handling rejects unsupported formats (the slash style `2/12/2019 1800`, non-date words, and dates without a time) for both deadlines and events, keeps the list unchanged, and shows accepted dates in a friendlier format than they were entered.
+- **Aim:** Verify that date handling rejects unsupported formats, impossible dates, and invalid times for both deadlines and events while leaving the list unchanged.
 - **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes/java/main echo.Echo`
 - **Inputs:**
 ```text
 deadline return book /by 2/12/2019 1800
 deadline return book /by banana
 deadline return book /by 2019-12-02
+deadline impossible /by 2019-02-30 1200
+deadline midnight /by 2019-12-31 2400
 event party /from 2019-12-02 1800 /to apple
 list
 bye
@@ -484,9 +486,59 @@ Signal scrambled.
 I need a description and valid deadline. Try: deadline <description> /by <yyyy-MM-dd HHmm>
 Example: deadline return book /by 2019-12-02 1800
 Signal scrambled.
+I need a description and valid deadline. Try: deadline <description> /by <yyyy-MM-dd HHmm>
+Example: deadline return book /by 2019-12-02 1800
+Signal scrambled.
+I need a description and valid deadline. Try: deadline <description> /by <yyyy-MM-dd HHmm>
+Example: deadline return book /by 2019-12-02 1800
+Signal scrambled.
 I need a description and valid times. Try: event <description> /from <yyyy-MM-dd HHmm> /to <yyyy-MM-dd HHmm>
 Example: event party /from 2019-12-02 1800 /to 2019-12-02 2100
 The mission manifest is clear.
+Echo going off-air. See you on the next mission!
+```
+
+## Test case: whitespace duplicates and parameters are validated
+
+- **Aim:** Verify that whitespace is normalized while duplicate tasks, extra arguments, repeated parameters, invalid event periods, and signed task numbers are rejected.
+- **Command:** `(if exist data rmdir /s /q data) & java -cp build/classes/java/main echo.Echo`
+- **Inputs:**
+```text
+  todo   read   book  
+todo read book
+list now
+deadline project /by 2025-01-15 1800 /by 2025-01-16 1800
+event sync /from 2025-01-15 1800 /to 2025-01-15 1800
+mark +1
+list
+bye
+```
+- **Expected output:**
+```text
+ _____     _           
+| ____|___| |__   ___  
+|  _| / __| '_ \ / _ \ 
+| |__| (__| | | | (_) |
+|_____\___|_| |_|\___/ 
+
+Signal acquired. Echo here, your feline mission controller.
+What are we tackling today?
+Mission logged:
+[T][ ] read book
+You now have 1 mission on the manifest.
+Signal scrambled.
+That mission is already on the manifest.
+Signal scrambled.
+The list command does not take extra details. Try: list
+Signal scrambled.
+I need a description and valid deadline. Try: deadline <description> /by <yyyy-MM-dd HHmm>
+Example: deadline return book /by 2019-12-02 1800
+Signal scrambled.
+An event must start before it ends.
+Signal scrambled.
+That mission number is not on the manifest. Use list to check the available numbers.
+Current mission manifest:
+1.[T][ ] read book
 Echo going off-air. See you on the next mission!
 ```
 
@@ -509,6 +561,8 @@ bye
 
 Signal acquired. Echo here, your feline mission controller.
 What are we tackling today?
+Signal scrambled.
+Mission archive problem: I could not understand line 2 because its fields are invalid: D | Sunday | return book | 2019-12-02T18:00
 The mission manifest is clear.
 Echo going off-air. See you on the next mission!
 ```
