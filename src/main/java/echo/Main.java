@@ -1,11 +1,15 @@
 package echo;
 
 import java.io.IOException;
+import java.net.URL;
 
 import echo.ui.components.MainWindow;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
@@ -24,7 +28,11 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/MainWindow.fxml"));
+            URL layout = Main.class.getResource("/view/MainWindow.fxml");
+            if (layout == null) {
+                throw new IllegalStateException("The main-window layout is missing.");
+            }
+            FXMLLoader fxmlLoader = new FXMLLoader(layout);
             AnchorPane ap = fxmlLoader.load();
             Scene scene = new Scene(ap);
             stage.setScene(scene);
@@ -33,8 +41,17 @@ public class Main extends Application {
             stage.setMinHeight(220);
             fxmlLoader.<MainWindow>getController().setEcho(echo);
             stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException | RuntimeException exception) {
+            showStartupError();
         }
+    }
+
+    private void showStartupError() {
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle("Echo could not start");
+        alert.setHeaderText("A required application resource could not be loaded.");
+        alert.setContentText("Please reinstall Echo or contact support.");
+        alert.showAndWait();
+        Platform.exit();
     }
 }
